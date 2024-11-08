@@ -45,7 +45,7 @@
     "@context": "https://schema.org",
     "@type": "Article",
     "publisher": {
-        "@type": "Organization",
+        "@type": "Organisation",
         "name": "Test ADHD Adulți (screening). Adult ADHD Self-Report Scale (ASRS v1.1)",
         "url": "https://www.testadhd.ro/",
         "logo": {
@@ -2024,6 +2024,44 @@ body {
     border-radius: 8px;
     padding-left: 1rem;
 }
+
+/* Confidential Banner Styling */
+.confidential-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background-color: #2e7d32; /* Green color for privacy assurance */
+    color: #ffffff;
+    font-weight: 400;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin: 1rem auto;
+    max-width: 800px;
+    text-align: center;
+    animation: fadeIn 0.8s ease-in-out;
+    gap: 0.5rem;
+}
+
+.confidential-banner i {
+    font-size: 1.5rem;
+    color: #ffffff;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    .confidential-banner {
+        font-size: 1rem;
+        padding: 0.8rem;
+    }
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 </style>
 </head>
 <body>
@@ -2035,7 +2073,7 @@ body {
             <h1 class="text-center mt-4 mb-3">Test screening ADHD adulți - ASRS v1.1 (Adult ADHD Self-Report Scale)</h1>
             <!-- <p class="lead text-center mb-4"></p> -->
 
-            <div class="quick-nav" id="quickNav">
+            <div class="quick-nav visible" id="quickNav">
                 <div class="quick-nav-content">
                     <a href="#info-section" class="quick-nav-item" data-section="info">
                         <i class="fas fa-circle-info"></i>
@@ -2064,25 +2102,32 @@ body {
                             <i class="fas fa-arrow-right secondary-icon"></i>
                         </div>
                         <div class="cta-text">
-                            <span class="cta-main">Începe Testul ASRS</span>
-                            <span class="cta-sub">Test gratuit • Durată 7 minute</span>
+                            <span class="cta-main">Începe testul ASRS v1.1</span>
+                            <span class="cta-sub"><b>GRATUIT</b>! Timp estimat: <b>7 minute</b>.</span>
                         </div>
                     </div>
                     <div class="pulse-ring"></div>
                 </a>
             </div>
-
+            <div class="confidential-banner">
+                <i class="fas fa-shield-alt"></i>
+                <span><b>100% CONFIDENȚIAL!</b> NU colectăm nicio informație despre tine. NU utilizăm cookies. NU stocăm rezultatele.</span>
+            </div>
             <!-- Author and Community Links Section -->
             <div class="attribution-section mb-4">
                 <!-- Built with love -->
                 <div class="built-with-love text-center mb-3">
                     <span class="text-muted">
-                        <i class="fas fa-code"></i> cu <i class="fas fa-heart text-danger animate-beat"></i> de
+                        <span>Convinge-te singur - codul sursă este disponibil gratuit pe</span>
+                        <a href="https://github.com/hodorogandrei/testadhd" target="_blank" class="text-decoration-none github-link">
+                            <i class="fab fa-github"></i> <b>GitHub</b>
+                        </a><br/><br/>
+                        <i class="fas fa-code"></i> cu <i class="fas fa-heart text-danger animate-beat"></i> și <a href="https://sos.lisdex.ro" target="_blank">Lisdexamfetamină</a> de
                         <a href="https://www.linkedin.com/in/andreihodorog/"
                            target="_blank"
                            class="text-decoration-none author-link">
                             <i class="fab fa-linkedin text-primary"></i>
-                            Andrei Hodorog
+                            <b>Andrei Hodorog</b>
                         </a>
                     </span>
                 </div>
@@ -2189,7 +2234,7 @@ body {
                         </div>
                         <h3>Lucrare seminală</h3>
                         <a href="https://pubmed.ncbi.nlm.nih.gov/15841682/" target="_blank">
-                            The World Health Organization Adult ADHD Self-Report Scale (ASRS v1.1)
+                            The World Health Organisation Adult ADHD Self-Report Scale (ASRS v1.1)
                             <i class="fas fa-external-link-alt"></i>
                         </a>
                     </div>
@@ -2331,7 +2376,7 @@ body {
                         <p>Nu amâna! Completează testul gratuit în doar 7 minute și obține claritate asupra necesității consultului unui profesionist calificat.</p>
                     </div>
                     <a href="#first-disclaimer" class="prompt-button">
-                        <span>Începe Testul</span>
+                        <span>Începe testul</span>
                         <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
@@ -2422,7 +2467,7 @@ body {
                             <div class="reference-number">1</div>
                             <div class="reference-content">
                                 <a href="https://pubmed.ncbi.nlm.nih.gov/15841682/" target="_blank">
-                                    The World Health Organization Adult ADHD Self-Report Scale (ASRS v1.1): a short screening scale for use in the general population
+                                    The World Health Organisation Adult ADHD Self-Report Scale (ASRS v1.1): a short screening scale for use in the general population
                                     <span class="authors">Kessler et al., 2005</span>
                                 </a>
                             </div>
@@ -2530,7 +2575,8 @@ body {
                         WHO
                     </div>
                     <p class="mb-0">
-                        ADHD-ASRS Screener v1.1 și ADHD-ASRS Symptom Checklist v1.1 sunt protejate prin drepturi de autor de către World Health Organization.
+                        ADHD-ASRS Screener v1.1 și ADHD-ASRS Symptom Checklist v1.1 sunt protejate prin drepturi de autor de către World Health Organisation.<br/><br/>
+                        Acest test este destinat <b>EXCLUSIV</b> în scop informativ (<b>de screening</b>) și <b>NU</b> trebuie utilizat ca instrument de diagnostic. Vă încurajăm să consultați un profesionist calificat (medic psihiatru sau psiholog clinician) pentru o evaluare completă. Vă sugerăm să vizitați <a href="https://www.doctoradhd.com/" target="_blank">doctoradhd.com</a>.
                     </p>
                 </div>
             </div>
@@ -2897,7 +2943,7 @@ function handleRadioChange(e) {
             if (!selected) unanswered.push(index + 1);
         });
 
-        console.log('unanswered remaining', unanswered);
+        // console.log('unanswered remaining', unanswered);
 
         // Update the error message to remove the answered question link
         updateErrorMessage(unanswered);
@@ -3392,7 +3438,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Show quick nav when:
         // 1. Scrolled past info-container
         // 2. Not yet reached the disclaimer
-        if (currentScroll >= infoContainerTop && currentScroll < disclaimerTop) {
+        // if (currentScroll >= infoContainerTop && currentScroll < disclaimerTop) {
+        if (currentScroll < disclaimerTop) {
             quickNav.classList.add('visible');
 
             // Update active section
