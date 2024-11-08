@@ -149,10 +149,6 @@ body {
     border-color: #90caf9;
 }
 
-.form-check.threshold-indicator {
-    border-left: 3px solid #ffc107;
-}
-
 .form-check-input {
     width: 24px;
     height: 24px;
@@ -322,7 +318,15 @@ body {
 /* Error States */
 .highlight-unanswered {
     background-color: rgba(255, 243, 205, 0.5) !important;
-    border-left-color: #ffc107 !important;
+    border-left: 4px solid #ff9800; /* Orange border */
+    border-radius: 8px;
+    padding-left: 1rem;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.error-message {
+    color: #d32f2f; /* Red color for error text */
+    margin-bottom: 1rem;
 }
 
 /* Attribution Section Styles */
@@ -1878,6 +1882,86 @@ body {
 .prompt-button:active {
     transform: translateY(1px);
 }
+
+.option-container {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background-color: white;
+    border-radius: 12px;
+    border: 2px solid #e5e7eb; /* light gray */
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.option-container:hover {
+    background-color: #ebf8ff; /* light blue on hover */
+    border-color: #bfdbfe; /* lighter blue border on hover */
+}
+
+.option-indicator {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid #d1d5db; /* gray */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+}
+
+.option-indicator-inner {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #3b82f6; /* blue when active */
+    opacity: 0;
+    transform: scale(0);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.option-container input[type="radio"]:checked + .option-indicator .option-indicator-inner {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.option-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.option-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151; /* dark gray */
+}
+
+.option-description {
+    font-size: 0.875rem;
+    color: #6b7280; /* gray */
+}
+
+.form-check.threshold-indicator {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 4px;
+    background-color: #fbbf24; /* yellow */
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.threshold-highlight {
+    border-left: 4px solid #fbbf24; /* Yellow left border for questions meeting the threshold */
+    border-radius: 8px;
+    padding-left: 1rem;
+}
 </style>
 </head>
 <body>
@@ -2319,11 +2403,12 @@ body {
             </div>
 
             <form id="asrsForm">
+                <div id="error" class="alert alert-danger" style="display: none;"></div>
+
                 <div id="questions" class="mb-4">
                     <!-- Questions will be populated here by JavaScript -->
                 </div>
 
-                <div id="error" class="alert alert-danger" style="display: none;"></div>
                 <div id="errorBelow" class="alert alert-danger" style="display: none;"></div>
 
                 <button type="button" id="submitBtn" class="btn btn-primary btn-lg w-100 mb-4 action-btn calculate-btn">
@@ -2342,7 +2427,7 @@ body {
         <div class="license-card">
             <div class="license-header">
                 <i class="fas fa-scale-balanced text-primary"></i>
-                <h4>Drepturi și Permisiuni</h4>
+                <h4>Drepturi și permisiuni</h4>
             </div>
 
             <div class="license-content">
@@ -2519,7 +2604,6 @@ const questions = [
 const form = document.getElementById('asrsForm');
 const questionsContainer = document.getElementById('questions');
 
-// Initialize form with questions
 questions.forEach((question, index) => {
     const questionDiv = document.createElement('div');
     questionDiv.classList.add('question', 'mb-4');
@@ -2527,13 +2611,11 @@ questions.forEach((question, index) => {
     questionDiv.setAttribute('aria-labelledby', `question-${index}-label`);
     questionDiv.setAttribute('data-question-number', index + 1);
 
-    // Question label container
     const questionLabel = document.createElement('div');
     questionLabel.id = `question-${index}-label`;
     questionLabel.classList.add('question-text');
     questionLabel.innerHTML = `${index + 1}. ${question.text}`;
 
-    // Add Part A/B indicator for screen readers
     const partNote = document.createElement('span');
     partNote.classList.add('sr-only');
     partNote.innerHTML = ` (Partea ${question.part === 1 ? 'A' : 'B'})`;
@@ -2541,75 +2623,76 @@ questions.forEach((question, index) => {
 
     questionDiv.appendChild(questionLabel);
 
-    // Create fieldset for radio buttons
     const fieldset = document.createElement('fieldset');
     fieldset.classList.add('options');
 
-    // Add legend for screen readers
     const legend = document.createElement('legend');
     legend.classList.add('sr-only');
     legend.innerHTML = `Opțiuni pentru întrebarea ${index + 1}`;
     fieldset.appendChild(legend);
 
     const options = [
-        {
-            label: "Niciodată",
-            value: "1",
-            description: "Nu se întâmplă niciodată sau foarte rar"
-        },
-        {
-            label: "Rareori",
-            value: "2",
-            description: "Se întâmplă ocazional, dar nu frecvent"
-        },
-        {
-            label: "Uneori",
-            value: "3",
-            description: "Se întâmplă din când în când"
-        },
-        {
-            label: "Adesea",
-            value: "4",
-            description: "Se întâmplă frecvent, în mod regulat"
-        },
-        {
-            label: "Foarte des",
-            value: "5",
-            description: "Se întâmplă aproape tot timpul"
-        }
+        { label: "Niciodată", value: "1", description: "Nu se întâmplă niciodată sau foarte rar" },
+        { label: "Rareori", value: "2", description: "Se întâmplă ocazional, dar nu frecvent" },
+        { label: "Uneori", value: "3", description: "Se întâmplă din când în când" },
+        { label: "Adesea", value: "4", description: "Se întâmplă frecvent, în mod regulat" },
+        { label: "Foarte des", value: "5", description: "Se întâmplă aproape tot timpul" }
     ];
 
     options.forEach((option, optionIndex) => {
         const label = document.createElement('label');
-        label.classList.add('form-check');
+        label.classList.add('option-container');
         label.setAttribute('for', `q${index}o${optionIndex}`);
+
+        // Add threshold highlight if the option meets the threshold
+        if (parseInt(option.value) >= question.threshold) {
+            label.classList.add('threshold-highlight');
+        }
 
         const input = document.createElement('input');
         input.type = 'radio';
         input.id = `q${index}o${optionIndex}`;
         input.name = `q${index}`;
         input.value = option.value;
-        input.classList.add('form-check-input');
-        input.setAttribute('aria-describedby', `q${index}o${optionIndex}-desc`);
+        input.classList.add('hidden');
+        label.appendChild(input);
 
-        // Add visual indicator if this option is at or above threshold
+        const indicator = document.createElement('div');
+        indicator.classList.add('option-indicator');
+        const innerCircle = document.createElement('div');
+        innerCircle.classList.add('option-indicator-inner');
+        indicator.appendChild(innerCircle);
+        label.appendChild(indicator);
+
+        input.addEventListener('change', () => {
+            document.querySelectorAll(`input[name="q${index}"]`).forEach(radio => {
+                const inner = radio.nextSibling.querySelector('.option-indicator-inner');
+                if (inner) inner.classList.remove('opacity-100', 'scale-100');
+            });
+            innerCircle.classList.add('opacity-100', 'scale-100');
+        });
+
+        const textContainer = document.createElement('div');
+        textContainer.classList.add('option-text');
+
+        const optionLabel = document.createElement('span');
+        optionLabel.classList.add('option-label');
+        optionLabel.textContent = option.label;
+
+        const description = document.createElement('span');
+        description.classList.add('option-description');
+        description.textContent = option.description;
+
+        textContainer.appendChild(optionLabel);
+        textContainer.appendChild(description);
+        label.appendChild(textContainer);
+
         if (parseInt(option.value) >= question.threshold) {
-            label.classList.add('threshold-indicator');
+            const thresholdIndicator = document.createElement('div');
+            thresholdIndicator.classList.add('threshold-indicator');
+            label.appendChild(thresholdIndicator);
         }
 
-        const span = document.createElement('span');
-        span.classList.add('form-check-label');
-        span.innerHTML = option.label;
-
-        // Add description for screen readers
-        const description = document.createElement('span');
-        description.id = `q${index}o${optionIndex}-desc`;
-        description.classList.add('sr-only');
-        description.innerHTML = option.description;
-
-        label.appendChild(input);
-        label.appendChild(span);
-        label.appendChild(description);
         fieldset.appendChild(label);
     });
 
@@ -2653,7 +2736,7 @@ function initProgressTracker() {
                     </span>
                     <span class="divider">|</span>
                     <span class="part-b-progress" title="Partea B (Întrebările 7-18)">
-                        B: <b>0</b>/11
+                        B: <b>0</b>/12
                     </span>
                 </div>
                 <span class="time-estimate">Timp rămas estimat: <b>7 minute</b></span>
@@ -2698,20 +2781,64 @@ function initProgressTracker() {
 // Initialize progress tracking
 initProgressTracker();
 
+// Function to update error message with clickable question links
+function updateErrorMessage(unansweredQuestions) {
+    const errorDiv = document.getElementById('error');
+    const errorBelowDiv = document.getElementById('errorBelow');
+
+    // If all questions are answered, hide the error message containers
+    if (unansweredQuestions.length === 0) {
+        errorDiv.style.display = 'none';
+        errorBelowDiv.style.display = 'none';
+        return;
+    }
+
+    // Generate clickable question links for unanswered questions
+    const questionLinks = unansweredQuestions.map(num => `<a href="#question-${num - 1}-label" class="question-link" data-question="${num}">${num}</a>`);
+    const errorMessage = `
+        <strong>Te rog să răspunzi la toate întrebările.</strong> Întrebări fără răspuns: ${questionLinks.join(', ')}
+    `;
+
+    // Set the error message in both containers
+    errorDiv.innerHTML = errorMessage;
+    errorBelowDiv.innerHTML = errorMessage;
+
+    // Add event listener to question links for navigation
+    document.querySelectorAll('.question-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = e.target.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                targetElement.classList.add('highlight-unanswered');
+                setTimeout(() => targetElement.classList.remove('highlight-unanswered'), 1500);
+            }
+        });
+    });
+}
+
 function handleRadioChange(e) {
     if (e.target.type === 'radio') {
-        const currentQuestion = e.target.closest('.question');
-        if (!currentQuestion) return;
+        const questionIndex = e.target.closest('.question');
+        if (!questionIndex) return;
 
         // Remove highlight if this was an unanswered question
-        currentQuestion.classList.remove('highlight-unanswered');
-        currentQuestion.classList.add('completed');
+        questionIndex.classList.remove('highlight-unanswered');
+        questionIndex.classList.add('completed');
 
-        // Clear any error messages
-        const errorDiv = document.getElementById('error');
-        const errorBelowDiv = document.getElementById('errorBelow');
-        if (errorDiv) errorDiv.style.display = 'none';
-        if (errorBelowDiv) errorBelowDiv.style.display = 'none';
+        const unanswered = [];
+
+        // Collect remaining unanswered questions
+        questions.forEach((_, index) => {
+            const selected = document.querySelector(`input[name="q${index}"]:checked`);
+            if (!selected) unanswered.push(index + 1);
+        });
+
+        console.log('unanswered remaining', unanswered);
+
+        // Update the error message to remove the answered question link
+        updateErrorMessage(unanswered);
 
         updateProgress();
 
@@ -2770,7 +2897,7 @@ function updateProgress() {
         partAProgress.innerHTML = `A: <b>${partAAnswered}</b>/6`;
     }
     if (partBProgress) {
-        partBProgress.innerHTML = `B: <b>${partBAnswered}</b>/11`;
+        partBProgress.innerHTML = `B: <b>${partBAnswered}</b>/12`;
     }
 
     // Update time estimate
@@ -2840,22 +2967,13 @@ function getCategoryForScore(partAScore) {
     };
 }
 
+// Reset error states
+const errorDiv = document.getElementById('error');
+const errorBelowDiv = document.getElementById('errorBelow');
+
 // Submit button event handler
 document.getElementById('submitBtn').addEventListener('click', (e) => {
     e.preventDefault();
-
-    // Reset error states
-    const errorDiv = document.getElementById('error');
-    const errorBelowDiv = document.getElementById('errorBelow');
-
-    if (errorDiv) {
-        errorDiv.style.display = 'none';
-        errorDiv.innerHTML = '';
-    }
-    if (errorBelowDiv) {
-        errorBelowDiv.style.display = 'none';
-        errorBelowDiv.innerHTML = '';
-    }
 
     // Clear previous highlights
     document.querySelectorAll('.highlight-unanswered').forEach(el => {
@@ -2877,16 +2995,32 @@ document.getElementById('submitBtn').addEventListener('click', (e) => {
 
     // Handle unanswered questions
     if (unanswered.length > 0) {
-        const errorMessage = `Te rog să răspunzi la toate întrebările. Întrebări fără răspuns: ${unanswered.join(', ')}`;
 
-        if (errorDiv) {
-            errorDiv.innerHTML = errorMessage;
-            errorDiv.style.display = 'block';
-        }
-        if (errorBelowDiv) {
-            errorBelowDiv.innerHTML = errorMessage;
-            errorBelowDiv.style.display = 'block';
-        }
+        // Create error message with clickable question links
+        const questionLinks = unanswered.map(num => `<a href="#question-${num - 1}-label" class="question-link">${num}</a>`);
+        const errorMessage = `
+            <strong>Te rog să răspunzi la toate întrebările.</strong> Întrebări fără răspuns: ${questionLinks.join(', ')}
+        `;
+
+        // Set the error message and show both error containers
+        errorDiv.innerHTML = errorMessage;
+        errorDiv.style.display = 'block';
+        errorBelowDiv.innerHTML = errorMessage;
+        errorBelowDiv.style.display = 'block';
+
+        // Add event listener for each question link to scroll to the question
+        document.querySelectorAll('.question-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = e.target.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    targetElement.classList.add('highlight-unanswered');
+                    setTimeout(() => targetElement.classList.remove('highlight-unanswered'), 1500);
+                }
+            });
+        });
 
         // Scroll to first unanswered
         const firstUnanswered = document.querySelector('.highlight-unanswered');
@@ -2899,6 +3033,16 @@ document.getElementById('submitBtn').addEventListener('click', (e) => {
     // Calculate and display results
     const scores = calculateScores();
     displayResults(scores);
+
+    // hide errors
+    if (errorDiv) {
+        errorDiv.style.display = 'none';
+        errorDiv.innerHTML = '';
+    }
+    if (errorBelowDiv) {
+        errorBelowDiv.style.display = 'none';
+        errorBelowDiv.innerHTML = '';
+    }
 
     // Hide progress bar
     const progressContainer = document.querySelector('.progress-container');
