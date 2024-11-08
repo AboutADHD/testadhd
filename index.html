@@ -651,6 +651,154 @@ body {
         font-size: 0.75rem;
     }
 }
+
+/* Rights Section Styles */
+.rights-section {
+    border-top: 1px solid rgba(0,0,0,0.1);
+    padding-top: 3rem;
+}
+
+.license-card {
+    background: linear-gradient(145deg, #ffffff, #f8f9fa);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.license-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.license-header i {
+    font-size: 1.8rem;
+}
+
+.license-header h4 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+    background: linear-gradient(45deg, #2196F3, #1976D2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.cc-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 2rem;
+    color: #2196F3;
+}
+
+.cc-version {
+    font-size: 1.2rem;
+    font-weight: 600;
+    background: #2196F3;
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+}
+
+.license-link {
+    color: #2196F3;
+    text-decoration: none;
+    font-weight: 500;
+    border-bottom: 2px solid rgba(33, 150, 243, 0.3);
+    transition: all 0.3s ease;
+}
+
+.license-link:hover {
+    color: #1976D2;
+    border-bottom-color: #1976D2;
+}
+
+.license-conditions {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.license-conditions li {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.5rem 0;
+    color: #555;
+}
+
+.license-conditions i {
+    font-size: 0.9rem;
+}
+
+.who-copyright {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: rgba(33, 150, 243, 0.05);
+    border-radius: 12px;
+}
+
+.who-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.8rem;
+    background: #2196F3;
+    color: white;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.who-badge i {
+    font-size: 1.2rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .rights-section {
+        padding-top: 2rem;
+    }
+
+    .license-card {
+        padding: 1.5rem;
+    }
+
+    .license-header h4 {
+        font-size: 1.2rem;
+    }
+
+    .cc-badge {
+        font-size: 1.6rem;
+    }
+
+    .who-copyright {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .who-badge {
+        padding: 0.6rem 1rem;
+    }
+}
+
+/* Optional hover effects */
+.license-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+.who-copyright:hover {
+    background: rgba(33, 150, 243, 0.08);
+    transition: all 0.3s ease;
+}
 </style>
 </head>
 <body>
@@ -661,7 +809,6 @@ body {
         <div class="col-12 col-lg-12">
             <h1 class="text-center mt-4 mb-3">Test screening ADHD adulți - ASRS v1.1 (Adult ADHD Self-Report Scale)</h1>
             <!-- <p class="lead text-center mb-4"></p> -->
-
              <!-- Mobile CTA Button -->
             <div class="d-lg-none text-center mb-4">
                 <a href="#first-disclaimer"
@@ -777,6 +924,58 @@ body {
 
             <div id="result" class="result" style="display: none;">
                 <!-- Results will be populated here by JavaScript -->
+            </div>
+        </div>
+    </div>
+    <!-- License section -->
+    <div class="rights-section mt-5">
+        <div class="license-card">
+            <div class="license-header">
+                <i class="fas fa-scale-balanced text-primary"></i>
+                <h4>Drepturi și Permisiuni</h4>
+            </div>
+
+            <div class="license-content">
+                <div class="cc-badge mb-3">
+                    <i class="fab fa-creative-commons"></i>
+                    <i class="fab fa-creative-commons-by"></i>
+                    <span class="cc-version">4.0</span>
+                </div>
+
+                <p class="mb-3">
+                    Acest articol este distribuit sub termenii
+                    <a href="https://creativecommons.org/licenses/by/4.0/"
+                       target="_blank"
+                       class="license-link">
+                        Creative Commons Attribution 4.0 International License
+                    </a>,
+                    care permite utilizarea, distribuirea și reproducerea nerestricționată în orice mediu, cu condiția:
+                </p>
+
+                <ul class="license-conditions">
+                    <li>
+                        <i class="fas fa-check text-success"></i>
+                        Acordării creditului corespunzător autorilor originali
+                    </li>
+                    <li>
+                        <i class="fas fa-check text-success"></i>
+                        Furnizării unui link către licența Creative Commons
+                    </li>
+                    <li>
+                        <i class="fas fa-check text-success"></i>
+                        Indicării dacă au fost făcute modificări
+                    </li>
+                </ul>
+
+                <div class="who-copyright mt-4">
+                    <div class="who-badge">
+                        <i class="fas fa-globe-americas"></i>
+                        WHO
+                    </div>
+                    <p class="mb-0">
+                        ADHD-ASRS Screener v1.1 și ADHD-ASRS Symptom Checklist v1.1 sunt protejate prin drepturi de autor de către World Health Organization.
+                    </p>
+                </div>
             </div>
         </div>
     </div>
