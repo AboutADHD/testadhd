@@ -2062,6 +2062,52 @@ body {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* PDF download buttons */
+.download-buttons {
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.download-heading {
+    font-size: 1.5rem;
+    color: #007bff;
+    margin-bottom: 1rem;
+}
+
+.download-text {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 1rem;
+}
+
+.btn-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 8px;
+    font-size: 1rem;
+    text-decoration: none;
+    margin: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-download i {
+    font-size: 1.2rem;
+}
+
+.btn-download:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
 </style>
 </head>
 <body>
@@ -2113,6 +2159,7 @@ body {
                 <i class="fas fa-shield-alt"></i>
                 <span><b>100% CONFIDENȚIAL!</b> NU colectăm nicio informație despre tine. NU utilizăm cookies. NU stocăm rezultatele.</span>
             </div>
+
             <!-- Author and Community Links Section -->
             <div class="attribution-section mb-4">
                 <!-- Built with love -->
@@ -2496,6 +2543,20 @@ body {
                 </div>
             </div>
 
+            <div class="download-buttons">
+                <h3 class="download-heading">Descarcă ASRS v1.1</h3>
+                <p class="download-text">
+                    Descărcați scala ASRS v1.1 originală sau traducerea în română pentru a explora mai multe detalii despre test.
+                </p>
+                <a href="https://www.apaservices.org/practice/reimbursement/health-registry/self-reporting-sympton-scale.pdf" 
+                   target="_blank" class="btn-download" download>
+                    <i class="fas fa-download"></i> Descarcă ASRS v1.1 Original (APA)
+                </a>
+                <a href="adhd-asrs.pdf" class="btn-download" download>
+                    <i class="fas fa-download"></i> Descarcă ASRS v1.1 Traducere Română
+                </a>
+            </div>
+
             <!-- Initial disclaimers -->
             <div id="first-disclaimer" class="alert alert-warning alert-dismissible fade show mb-4 text-center" role="alert">
                 <h4 class="alert-heading">Important</h4>
@@ -2508,7 +2569,6 @@ body {
                 </p>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-
             <form id="asrsForm">
                 <div id="error" class="alert alert-danger" style="display: none;"></div>
 
