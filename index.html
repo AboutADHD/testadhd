@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test screening ADHD adulți - ASRS v1.1 (Adult ADHD Self-Report Scale)</title>
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- FontAwesome CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+/* Progress Bar Styles */
+.progress-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: white;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    padding: 1rem;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+.progress-container.visible {
+    transform: translateY(0);
+    pointer-events: auto;
+    visibility: visible;
+}
+
+.progress-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.parts-progress {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: #666;
+}
+
+.parts-progress .divider {
+    color: #ddd;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background: #f0f0f0;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2196F3, #64B5F6);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.progress-marker {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 2px;
+    background-color: #FFC107;
+    transition: opacity 0.3s ease;
+}
+
+.progress-message {
+    text-align: center;
+    margin-top: 0.5rem;
+    color: #333;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    animation: messagePopIn 0.5s ease;
+}
+
+/* Question Styles */
+.question {
+    position: relative;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-left: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.question.current {
+    border-left-color: #2196F3;
+    background-color: #f8f9fa;
+}
+
+.question.completed::after {
+    content: '✓';
+    color: #4CAF50;
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+}
+
+.question-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
+    font-weight: 500;
+    padding: 0.8rem;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+}
+
+.form-check {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    min-height: 3.5rem;
+}
+
+.form-check:hover {
+    background-color: #f5f9ff;
+    border-color: #90caf9;
+}
+
+.form-check.threshold-indicator {
+    border-left: 3px solid #ffc107;
+}
+
+.form-check-input {
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
+    cursor: pointer;
+}
+
+.form-check-label {
+    font-size: 1.1rem;
+    padding: 0.5rem;
+    color: #455a64;
+    cursor: pointer;
+    user-select: none;
+    flex: 1;
+}
+
+/* Help Button Styles */
+.help-button {
+    color: #666;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    border: none;
+    background: none;
+    border-radius: 4px;
+}
+
+.help-button:hover {
+    color: #2196F3;
+    background-color: rgba(33, 150, 243, 0.1);
+}
+
+.help-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease-out;
+    opacity: 0;
+}
+
+.help-content:not([hidden]) {
+    max-height: 200px;
+    opacity: 1;
+    margin-top: 1rem;
+}
+
+/* Results Styles */
+.result-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.category-badge {
+    font-size: 2rem;
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+}
+
+.score-section {
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+}
+
+.score-section:hover {
+    transform: translateY(-2px);
+}
+
+.score-details {
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.score-label {
+    color: #666;
+    font-weight: 500;
+}
+
+.score-value {
+    color: #2196F3;
+}
+
+.score-interpretation {
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.5;
+}
+
+/* Action Buttons */
+.action-btn {
+    transition: all 0.3s ease;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 12px 24px;
+    width: 100%;
+    border: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.calculate-btn {
+    background: linear-gradient(45deg, #2196F3, #1976D2);
+    color: white;
+}
+
+/* Loading State */
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+}
+
+.btn-loading:after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin: -10px 0 0 -10px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+/* Animations */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes messagePopIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    body {
+        margin: 10px;
+    }
+
+    .question {
+        padding: 1rem;
+    }
+
+    .form-check {
+        padding: 0.8rem;
+        min-height: 3rem;
+    }
+
+    .form-check-label {
+        font-size: 1rem;
+    }
+}
+
+/* Error States */
+.highlight-unanswered {
+    background-color: rgba(255, 243, 205, 0.5) !important;
+    border-left-color: #ffc107 !important;
+}
+
+/* Attribution Section Styles */
+.attribution-section {
+    padding: 1rem;
+    border-radius: 12px;
+    background: linear-gradient(145deg, #ffffff, #f8f9fa);
+    box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+}
+
+.built-with-love {
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+}
+
+.author-link {
+    position: relative;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.author-link:hover {
+    background-color: rgba(0, 119, 181, 0.1);
+    color: #0077b5;
+}
+
+/* Animated heart beat effect */
+.animate-beat {
+    animation: heartBeat 1.5s ease infinite;
+}
+
+@keyframes heartBeat {
+    0% { transform: scale(1); }
+    14% { transform: scale(1.3); }
+    28% { transform: scale(1); }
+    42% { transform: scale(1.3); }
+    70% { transform: scale(1); }
+}
+
+/* Support Group Button Styles */
+.support-btn {
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-width: 2px;
+}
+
+.support-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(66, 103, 178, 0.2);
+    background-color: #4267B2;
+    border-color: #4267B2;
+}
+
+.members-badge {
+    background-color: rgba(66, 103, 178, 0.1);
+    padding: 0.2rem 0.8rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.support-btn:hover .members-badge {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .attribution-section {
+        padding: 0.8rem;
+    }
+
+    .built-with-love {
+        font-size: 0.9rem;
+    }
+
+    .support-btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+
+    .members-badge {
+        padding: 0.15rem 0.6rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Resources Grid Styles */
+.resources-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.resource-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 1.25rem;
+    border-radius: 12px;
+    background: white;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+
+.resource-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1));
+    transition: all 0.3s ease;
+}
+
+.resource-card:hover {
+    transform: translateY(-3px);
+    color: inherit;
+    border-color: transparent;
+}
+
+.resource-card:hover::before {
+    opacity: 0;
+}
+
+/* Card variants */
+.resource-card.clinical {
+    background: linear-gradient(145deg, #4CAF50, #45a049);
+}
+
+.resource-card.educational {
+    background: linear-gradient(145deg, #2196F3, #1976D2);
+}
+
+.resource-card.community {
+    background: linear-gradient(145deg, #4267B2, #365899);
+}
+
+.resource-card:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.2);
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.icon-wrapper i {
+    font-size: 1.5rem;
+    color: white;
+}
+
+.content {
+    flex: 1;
+}
+
+.content h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem;
+    color: white;
+}
+
+.content p {
+    font-size: 1rem;
+    margin: 0;
+    opacity: 0.9;
+    color: rgba(255,255,255,0.9);
+}
+
+.visit-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.9);
+    margin-top: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.resource-card:hover .visit-link {
+    color: white;
+    gap: 0.75rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .resources-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .resources-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .resource-card {
+        padding: 1rem;
+    }
+
+    .icon-wrapper {
+        width: 40px;
+        height: 40px;
+    }
+
+    .icon-wrapper i {
+        font-size: 1.25rem;
+    }
+
+    .content h3 {
+        font-size: 0.95rem;
+    }
+
+    .content p {
+        font-size: 0.8rem;
+    }
+}
+
+/* Animation for icons */
+@keyframes floatIcon {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+    100% { transform: translateY(0); }
+}
+
+.resource-card:hover .icon-wrapper i {
+    animation: floatIcon 1s ease infinite;
+}
+
+/* CTA Button Styles */
+.cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 1.5rem;
+    background: linear-gradient(145deg, #2196F3, #1976D2);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 300px;
+}
+
+.cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
+    color: white;
+}
+
+.cta-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    font-size: 1.1rem;
+}
+
+.cta-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1;
+    text-align: left;
+}
+
+.cta-title {
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.2;
+}
+
+.cta-time {
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+
+.cta-arrow {
+    display: flex;
+    align-items: center;
+    opacity: 0.8;
+    transition: transform 0.3s ease;
+}
+
+.cta-button:hover .cta-arrow {
+    transform: translateX(3px);
+    opacity: 1;
+}
+
+@media (max-width: 576px) {
+    .cta-button {
+        padding: 0.7rem 1.2rem;
+    }
+
+    .cta-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 1rem;
+    }
+
+    .cta-title {
+        font-size: 0.95rem;
+    }
+
+    .cta-time {
+        font-size: 0.75rem;
+    }
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <!-- Progress bar container will be injected by JS -->
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-12">
+            <h1 class="text-center mt-4 mb-3">Test screening ADHD adulți - ASRS v1.1 (Adult ADHD Self-Report Scale)</h1>
+            <!-- <p class="lead text-center mb-4"></p> -->
+
+             <!-- Mobile CTA Button -->
+            <div class="d-lg-none text-center mb-4">
+                <a href="#first-disclaimer"
+                   class="btn cta-button">
+                    <span class="cta-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </span>
+                    <span class="cta-content">
+                        <span class="cta-title">Începe testul acum</span>
+                        <span class="cta-time">Durată: 7 minute</span>
+                    </span>
+                    <span class="cta-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </span>
+                </a>
+            </div>
+
+            <!-- Author and Community Links Section -->
+            <div class="attribution-section mb-4">
+                <!-- Built with love -->
+                <div class="built-with-love text-center mb-3">
+                    <span class="text-muted">
+                        <i class="fas fa-code"></i> cu <i class="fas fa-heart text-danger animate-beat"></i> de
+                        <a href="https://www.linkedin.com/in/andreihodorog/"
+                           target="_blank"
+                           class="text-decoration-none author-link">
+                            <i class="fab fa-linkedin text-primary"></i>
+                            Andrei Hodorog
+                        </a>
+                    </span>
+                </div>
+
+                <!-- Resources Grid -->
+                <div class="resources-grid">
+                    <!-- Educational Resources -->
+                    <a href="https://www.despreadhd.ro"
+                       target="_blank"
+                       class="resource-card educational">
+                        <div class="icon-wrapper">
+                            <i class="fas fa-book-reader"></i>
+                        </div>
+                        <div class="content">
+                            <h2>Informații și Educație</h2>
+                            <p>Resurse și informații științifice despre ADHD din surse de autoritate</p>
+                            <span class="visit-link">
+                                despreadhd.ro
+                                <i class="fas fa-arrow-right"></i>
+                            </span>
+                        </div>
+                    </a>
+                    <!-- Clinical Resources -->
+                    <a href="https://www.doctoradhd.com"
+                       target="_blank"
+                       class="resource-card clinical">
+                        <div class="icon-wrapper">
+                            <i class="fas fa-stethoscope"></i>
+                        </div>
+                        <div class="content">
+                            <h2>Diagnostic și Tratament</h2>
+                            <p>Profesioniști cu experiență în evaluarea, diagnosticul și tratamentul ADHD la adulți</p>
+                            <span class="visit-link">
+                                doctoradhd.com
+                                <i class="fas fa-arrow-right"></i>
+                            </span>
+                        </div>
+                    </a>
+
+
+                    <!-- Support Group Link -->
+                    <a href="https://fb.com/groups/aboutadhd"
+                       target="_blank"
+                       class="resource-card community">
+                        <div class="icon-wrapper">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="content">
+                            <h2>Comunitate și Suport</h2>
+                            <p>Grup de suport cu peste 7.700 membri</p>
+                            <span class="visit-link">
+                                Grup Facebook
+                                <i class="fab fa-facebook"></i>
+                            </span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <!-- Initial disclaimers -->
+            <div id="first-disclaimer" class="alert alert-warning alert-dismissible fade show mb-4 text-center" role="alert">
+                <h4 class="alert-heading">Important</h4>
+                <p>
+                    Acest test este destinat <b>EXCLUSIV</b> în scop informativ (<b>de screening</b>) și <b>NU</b> trebuie utilizat ca instrument de diagnostic.
+
+                    <br/>Vă încurajăm să consultați un profesionist calificat (medic psihiatru sau psiholog clinician) pentru o evaluare completă.
+
+                    <br/>Vă sugerăm să vizitați <a href="https://www.doctoradhd.com/" target="_blank">doctoradhd.com</a>.
+                </p>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <form id="asrsForm">
+                <div id="questions" class="mb-4">
+                    <!-- Questions will be populated here by JavaScript -->
+                </div>
+
+                <div id="error" class="alert alert-danger" style="display: none;"></div>
+                <div id="errorBelow" class="alert alert-danger" style="display: none;"></div>
+
+                <button type="button" id="submitBtn" class="btn btn-primary btn-lg w-100 mb-4 action-btn calculate-btn">
+                    <i class="fas fa-calculator"></i>
+                    Calculează Scorul
+                </button>
+            </form>
+
+            <div id="result" class="result" style="display: none;">
+                <!-- Results will be populated here by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Restart Warning Modal -->
+<div class="modal fade" id="restartWarningModal" tabindex="-1" aria-labelledby="restartWarningModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="restartWarningModalLabel">Confirmare restart test</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-danger mb-3">
+                    <strong>Atenție!</strong> Sunteți pe cale să începeți un test nou.
+                </p>
+                <p>
+                    Toate răspunsurile și scorul actual vor fi șterse.
+                </p>
+                <p class="mb-0">
+                    Doriți să continuați?
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anulează</button>
+                <button type="button" class="btn btn-danger" id="confirmRestartBtn">Da, începe un test nou</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ASRS v1.1 Questions Definition
+const questions = [
+    {
+        text: "Cât de des vă este greu să puneți la punct ultimele detalii ale unui proiect, după ce părțile dificile au fost realizate?",
+        threshold: 3, // "Uneori" or higher signals ADHD trait
+        part: 1 // Part A: questions 1-6
+    },
+    {
+        text: "Cât de des aveți dificultăți în a face ordine atunci când aveti de îndeplinit o sarcină care necesită organizare?",
+        threshold: 3,
+        part: 1
+    },
+    {
+        text: "Cât de des aveți probleme în a vă aminti ca aveti stabilite întâlniri sau de indeplinit obligații?",
+        threshold: 3,
+        part: 1
+    },
+    {
+        text: "Atunci când ai o sarcină care necesită multă gândire/efort sustinut de concentrare, cât de des eviți sau întârzii să începeți?",
+        threshold: 3,
+        part: 1
+    },
+    {
+        text: "Cât de des vă agitați sau mișcați mâinile sau picioarele atunci când trebuie să stati asezat pentru o perioadă lungă de timp?",
+        threshold: 3,
+        part: 1
+    },
+    {
+        text: "Cât de des vă simțiți excesiv de activ și obligat(ă) să faceți lucruri, ca și cum ați fi fi condus(ă) de un motor?",
+        threshold: 3,
+        part: 1
+    },
+    {
+        text: "Cât de des faceți greșeli din neglijenta atunci când trebuie să lucrați la un proiect plictisitor sau dificil?",
+        threshold: 3,
+        part: 2
+    },
+    {
+        text: "Cât de des aveți dificultăți în a vă menține atenția atunci când faceți o muncă plictisitoare sau repetitivă?",
+        threshold: 3,
+        part: 2
+    },
+    {
+        text: "Cât de des aveți dificultăți în a vă concentra asupra a ceea ce vă spun oamenii, chiar și atunci când aceștia vi se adreseaza direct?",
+        threshold: 3,
+        part: 2
+    },
+    {
+        text: "Cât de des rătăciți obiecte sau aveți dificultăți în găsirea acestora acasă sau la serviciu?",
+        threshold: 3,
+        part: 2
+    },
+    {
+        text: "Cât de des sunteți distras(ă) de activități sau zgomote din jurul dvs.?",
+        threshold: 3,
+        part: 2
+    },
+    {
+        text: "Cât de des vă părăsiți locul în ședințe sau în alte situații în care este de asteptat să stați asezat?",
+        threshold: 3,
+        part: 2
+    },
+    {
+        text: "Cât de des vă simțiți neliniștit(ă) sau agitat(ă)?",
+        threshold: 3,
+        part: 2
+    },
+    {
+        text: "Cât de des aveți dificultăți în a vă destinde și relaxa atunci când aveți timp pentru dvs.?",
+        threshold: 3,
+        part: 2
+    },
+    {
+        text: "Cât de des vi se întâmplă să vorbiți prea mult în contexte sociale?",
+        threshold: 3,
+        part: 2
+    },
+    {
+        text: "Când sunteți angajat(ă) într-o conversație, cât de des vă aflați in situatia de a finaliza propozițiile celorlalți, înainte ca aceștia să le finalizeze?",
+        threshold: 3,
+        part: 2
+    },
+    {
+        text: "Cât de des întâmpinați dificultăți în a vă aștepta rândul în situații în care este necesar să asteptati sa va vina randul?",
+        threshold: 3,
+        part: 2
+    },
+    {
+        text: "Cât de des îi întrerupeți din activitate pe ceilalți atunci când sunt ocupați?",
+        threshold: 3,
+        part: 2
+    }
+];
+
+// Initialize test when DOM is ready
+const form = document.getElementById('asrsForm');
+const questionsContainer = document.getElementById('questions');
+
+// Initialize form with questions
+questions.forEach((question, index) => {
+    const questionDiv = document.createElement('div');
+    questionDiv.classList.add('question', 'mb-4');
+    questionDiv.setAttribute('role', 'group');
+    questionDiv.setAttribute('aria-labelledby', `question-${index}-label`);
+    questionDiv.setAttribute('data-question-number', index + 1);
+
+    // Question label container
+    const questionLabel = document.createElement('div');
+    questionLabel.id = `question-${index}-label`;
+    questionLabel.classList.add('question-text');
+    questionLabel.innerHTML = `${index + 1}. ${question.text}`;
+
+    // Add Part A/B indicator for screen readers
+    const partNote = document.createElement('span');
+    partNote.classList.add('sr-only');
+    partNote.innerHTML = ` (Partea ${question.part === 1 ? 'A' : 'B'})`;
+    questionLabel.appendChild(partNote);
+
+    questionDiv.appendChild(questionLabel);
+
+    // Create fieldset for radio buttons
+    const fieldset = document.createElement('fieldset');
+    fieldset.classList.add('options');
+
+    // Add legend for screen readers
+    const legend = document.createElement('legend');
+    legend.classList.add('sr-only');
+    legend.innerHTML = `Opțiuni pentru întrebarea ${index + 1}`;
+    fieldset.appendChild(legend);
+
+    const options = [
+        {
+            label: "Niciodată",
+            value: "1",
+            description: "Nu se întâmplă niciodată sau foarte rar"
+        },
+        {
+            label: "Rareori",
+            value: "2",
+            description: "Se întâmplă ocazional, dar nu frecvent"
+        },
+        {
+            label: "Uneori",
+            value: "3",
+            description: "Se întâmplă din când în când"
+        },
+        {
+            label: "Adesea",
+            value: "4",
+            description: "Se întâmplă frecvent, în mod regulat"
+        },
+        {
+            label: "Foarte des",
+            value: "5",
+            description: "Se întâmplă aproape tot timpul"
+        }
+    ];
+
+    options.forEach((option, optionIndex) => {
+        const label = document.createElement('label');
+        label.classList.add('form-check');
+        label.setAttribute('for', `q${index}o${optionIndex}`);
+
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.id = `q${index}o${optionIndex}`;
+        input.name = `q${index}`;
+        input.value = option.value;
+        input.classList.add('form-check-input');
+        input.setAttribute('aria-describedby', `q${index}o${optionIndex}-desc`);
+
+        // Add visual indicator if this option is at or above threshold
+        if (parseInt(option.value) >= question.threshold) {
+            label.classList.add('threshold-indicator');
+        }
+
+        const span = document.createElement('span');
+        span.classList.add('form-check-label');
+        span.innerHTML = option.label;
+
+        // Add description for screen readers
+        const description = document.createElement('span');
+        description.id = `q${index}o${optionIndex}-desc`;
+        description.classList.add('sr-only');
+        description.innerHTML = option.description;
+
+        label.appendChild(input);
+        label.appendChild(span);
+        label.appendChild(description);
+        fieldset.appendChild(label);
+    });
+
+    questionDiv.appendChild(fieldset);
+
+    // Add help button with specific ASRS guidance
+    const helpButton = document.createElement('button');
+    helpButton.type = 'button';
+    helpButton.classList.add('help-button', 'btn', 'btn-link', 'mt-2');
+    helpButton.innerHTML = '<i class="fas fa-question-circle"></i> Ajutor pentru această întrebare';
+    helpButton.setAttribute('aria-expanded', 'false');
+    helpButton.setAttribute('aria-controls', `help-${index}`);
+
+    const helpContent = document.createElement('div');
+    helpContent.id = `help-${index}`;
+    helpContent.classList.add('help-content');
+    helpContent.setAttribute('hidden', '');
+    helpContent.innerHTML = `
+        <div class="alert alert-info mt-2">
+            <p>Această întrebare face parte din ${question.part === 1 ? 'prima' : 'a doua'} parte a testului ASRS v1.1</p>
+            <p>Gândiți-vă la experiențele dvs. din ultimele 6 luni.</p>
+            <p>Alegeți răspunsul care descrie cel mai bine frecvența cu care vi se întâmplă acest lucru.</p>
+        </div>
+    `;
+
+    questionDiv.appendChild(helpButton);
+    questionDiv.appendChild(helpContent);
+    questionsContainer.appendChild(questionDiv);
+});
+
+// Progress Tracking Functions
+function initProgressTracker() {
+    // Create and insert progress bar
+    const progressHtml = `
+        <div class="progress-container">
+            <div class="progress-stats">
+                <span class="questions-completed"><b>0</b> din <b>18</b> întrebări</span>
+                <div class="parts-progress">
+                    <span class="part-a-progress" title="Partea A (Întrebările 1-6)">
+                        A: <b>0</b>/6
+                    </span>
+                    <span class="divider">|</span>
+                    <span class="part-b-progress" title="Partea B (Întrebările 7-18)">
+                        B: <b>0</b>/11
+                    </span>
+                </div>
+                <span class="time-estimate">Timp rămas estimat: <b>7 minute</b></span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+                <div class="progress-marker part-a" title="Sfârșitul Părții A" style="left: 35.3%"></div>
+            </div>
+            <div class="progress-message">
+                🚀 Hai să începem! Primul pas este cel mai important! 💫
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('afterbegin', progressHtml);
+
+    // Cache DOM elements
+    const progressContainer = document.querySelector('.progress-container');
+    const progressFill = document.querySelector('.progress-fill');
+    const questionsCompleted = document.querySelector('.questions-completed');
+    const partAProgress = document.querySelector('.part-a-progress');
+    const partBProgress = document.querySelector('.part-b-progress');
+    const timeEstimate = document.querySelector('.time-estimate');
+    const progressMessage = document.querySelector('.progress-message');
+
+    // Add radio change event listener for progress updates
+    document.addEventListener('change', handleRadioChange);
+
+    // Add scroll event listener for progress bar visibility
+    window.addEventListener('scroll', handleScroll);
+
+    // Initial progress update
+    updateProgress();
+
+    // Return control functions
+    return {
+        update: updateProgress,
+        hide: () => progressContainer.classList.remove('visible'),
+        show: () => progressContainer.classList.add('visible')
+    };
+}
+
+// Initialize progress tracking
+initProgressTracker();
+
+function handleRadioChange(e) {
+    if (e.target.type === 'radio') {
+        const currentQuestion = e.target.closest('.question');
+        if (!currentQuestion) return;
+
+        // Remove highlight if this was an unanswered question
+        currentQuestion.classList.remove('highlight-unanswered');
+        currentQuestion.classList.add('completed');
+
+        // Clear any error messages
+        const errorDiv = document.getElementById('error');
+        const errorBelowDiv = document.getElementById('errorBelow');
+        if (errorDiv) errorDiv.style.display = 'none';
+        if (errorBelowDiv) errorBelowDiv.style.display = 'none';
+
+        updateProgress();
+
+        // Find and scroll to next unanswered question
+        const nextUnanswered = Array.from(document.querySelectorAll('.question:not(.completed)'))
+            .find(q => !q.querySelector('input[type="radio"]:checked'));
+
+        if (nextUnanswered) {
+            document.querySelectorAll('.question').forEach(q => q.classList.remove('current'));
+            nextUnanswered.classList.add('current');
+            scrollToQuestion(nextUnanswered);
+        }
+    }
+}
+
+function handleScroll() {
+    const testContainer = document.getElementById('questions');
+    const progressContainer = document.querySelector('.progress-container');
+
+    if (testContainer && progressContainer) {
+        const rect = testContainer.getBoundingClientRect();
+        const hasAnswers = document.querySelector('input[type="radio"]:checked') !== null;
+
+        if (rect.top <= 0 && rect.bottom >= 0 && hasAnswers) {
+            progressContainer.classList.add('visible');
+        } else {
+            progressContainer.classList.remove('visible');
+        }
+    }
+}
+
+function updateProgress() {
+    const answered = document.querySelectorAll('input[type="radio"]:checked').length;
+    const total = questions.length;
+    const percentage = (answered / total) * 100;
+
+    const progressFill = document.querySelector('.progress-fill');
+    const questionsCompleted = document.querySelector('.questions-completed');
+    const partAProgress = document.querySelector('.part-a-progress');
+    const partBProgress = document.querySelector('.part-b-progress');
+    const timeEstimate = document.querySelector('.time-estimate');
+    const progressMessage = document.querySelector('.progress-message');
+
+    if (progressFill) progressFill.style.width = `${percentage}%`;
+    if (questionsCompleted) {
+        questionsCompleted.innerHTML = `<b>${answered}</b> din <b>${total}</b> întrebări`;
+    }
+
+    // Calculate Part A and B progress
+    const partAAnswered = Array.from(questions.slice(0, 6))
+        .filter((_, index) => document.querySelector(`input[name="q${index}"]:checked`)).length;
+    const partBAnswered = Array.from(questions.slice(6))
+        .filter((_, index) => document.querySelector(`input[name="q${index + 6}"]:checked`)).length;
+
+    if (partAProgress) {
+        partAProgress.innerHTML = `A: <b>${partAAnswered}</b>/6`;
+    }
+    if (partBProgress) {
+        partBProgress.innerHTML = `B: <b>${partBAnswered}</b>/11`;
+    }
+
+    // Update time estimate
+    const remainingQuestions = total - answered;
+    const estimatedMinutes = Math.max(Math.ceil(remainingQuestions * 0.4), 1);
+    if (timeEstimate) {
+        timeEstimate.innerHTML = `Timp rămas estimat: <b>${estimatedMinutes} minute</b>`;
+    }
+
+    // Update progress message
+    if (progressMessage) {
+        progressMessage.innerHTML = getProgressMessage(percentage, partAAnswered === 6);
+    }
+}
+
+function getProgressMessage(percentage, partACompleted) {
+    if (percentage === 0) return '🚀 Hai să începem! Primul pas este cel mai important! 💫';
+    if (percentage <= 35.3) return '🌟 Completezi Partea A a testului! Continuă tot așa! 💪';
+    if (partACompleted && percentage <= 36) return '🎯 Ai terminat Partea A! Acum începem Partea B! ⭐';
+    if (percentage <= 75) return '💫 Progresezi bine în Partea B! Mai puțin de jumătate rămas! 🎈';
+    if (percentage < 100) return '🎊 Aproape gata! Încă puțin! 🌟';
+    return '🎉 FELICITĂRI! Ai completat tot testul! 🎯';
+}
+
+// Score calculation
+function calculateScores() {
+    let partAScore = 0;
+    let partBScore = 0;
+    let totalPositiveResponses = 0;
+
+    questions.forEach((question, index) => {
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        if (selected) {
+            const value = parseInt(selected.value);
+            if (value >= question.threshold) {
+                if (question.part === 1) {
+                    partAScore++;
+                } else {
+                    partBScore++;
+                }
+                totalPositiveResponses++;
+            }
+        }
+    });
+
+    return { partAScore, partBScore, totalPositiveResponses };
+}
+
+function getCategoryForScore(partAScore) {
+    if (partAScore >= 4) {
+        return {
+            category: "Nivel ridicat",
+            description: "Scorurile indică o probabilitate ridicată de ADHD. Se recomandă evaluarea clinică detaliată.",
+            color: "danger"
+        };
+    } else if (partAScore >= 2) {
+        return {
+            category: "Nivel moderat",
+            description: "Scorurile indică posibile trăsături ADHD. Se recomandă discuție cu un specialist.",
+            color: "warning"
+        };
+    }
+    return {
+        category: "Nivel scăzut",
+        description: "Scorurile nu indică un pattern semnificativ de simptome ADHD.",
+        color: "success"
+    };
+}
+
+// Submit button event handler
+document.getElementById('submitBtn').addEventListener('click', (e) => {
+    e.preventDefault();
+
+    // Reset error states
+    const errorDiv = document.getElementById('error');
+    const errorBelowDiv = document.getElementById('errorBelow');
+
+    if (errorDiv) {
+        errorDiv.style.display = 'none';
+        errorDiv.innerHTML = '';
+    }
+    if (errorBelowDiv) {
+        errorBelowDiv.style.display = 'none';
+        errorBelowDiv.innerHTML = '';
+    }
+
+    // Clear previous highlights
+    document.querySelectorAll('.highlight-unanswered').forEach(el => {
+        el.classList.remove('highlight-unanswered');
+    });
+
+    // Check for unanswered questions
+    let unanswered = [];
+    questions.forEach((_, index) => {
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        if (!selected) {
+            unanswered.push(index + 1);
+            const questionDiv = document.querySelector(`[data-question-number="${index + 1}"]`);
+            if (questionDiv) {
+                questionDiv.classList.add('highlight-unanswered');
+            }
+        }
+    });
+
+    // Handle unanswered questions
+    if (unanswered.length > 0) {
+        const errorMessage = `Te rog să răspunzi la toate întrebările. Întrebări fără răspuns: ${unanswered.join(', ')}`;
+
+        if (errorDiv) {
+            errorDiv.innerHTML = errorMessage;
+            errorDiv.style.display = 'block';
+        }
+        if (errorBelowDiv) {
+            errorBelowDiv.innerHTML = errorMessage;
+            errorBelowDiv.style.display = 'block';
+        }
+
+        // Scroll to first unanswered
+        const firstUnanswered = document.querySelector('.highlight-unanswered');
+        if (firstUnanswered) {
+            scrollToQuestion(firstUnanswered);
+        }
+        return;
+    }
+
+    // Calculate and display results
+    const scores = calculateScores();
+    displayResults(scores);
+
+    // Hide progress bar
+    const progressContainer = document.querySelector('.progress-container');
+    if (progressContainer) {
+        progressContainer.classList.remove('visible');
+    }
+
+    // Disable all inputs after submission
+    document.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.disabled = true;
+    });
+});
+
+// Helper function for scrolling
+function scrollToQuestion(questionElement) {
+    const progressContainer = document.querySelector('.progress-container');
+    const offset = progressContainer ? progressContainer.offsetHeight + 20 : 20;
+
+    window.scrollTo({
+        top: questionElement.offsetTop - offset,
+        behavior: 'smooth'
+    });
+}
+
+// Restart functionality
+function showRestartWarning() {
+    const modal = new bootstrap.Modal(document.getElementById('restartWarningModal'));
+    modal.show();
+}
+
+function restartTest() {
+    // Reset progress container
+    const progressContainer = document.querySelector('.progress-container');
+    if (progressContainer) {
+        progressContainer.style.display = '';
+        setTimeout(() => progressContainer.classList.add('visible'), 10);
+    }
+
+    // Reset form elements
+    document.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.checked = false;
+        radio.disabled = false;
+    });
+
+    // Reset question states
+    document.querySelectorAll('.question').forEach(question => {
+        question.classList.remove('completed', 'current', 'highlight-unanswered');
+    });
+
+    // Add current class to first question
+    const firstQuestion = document.querySelector('.question');
+    if (firstQuestion) {
+        firstQuestion.classList.add('current');
+    }
+
+    // Reset UI elements
+    const resultDiv = document.getElementById('result');
+    const submitBtn = document.getElementById('submitBtn');
+    const errorDiv = document.getElementById('error');
+    const errorBelowDiv = document.getElementById('errorBelow');
+
+    if (resultDiv) resultDiv.style.display = 'none';
+    if (submitBtn) submitBtn.style.display = 'block';
+    if (errorDiv) errorDiv.style.display = 'none';
+    if (errorBelowDiv) errorBelowDiv.style.display = 'none';
+
+    // Hide modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('restartWarningModal'));
+    if (modal) modal.hide();
+
+    // Reset progress
+    updateProgress();
+
+    // Scroll to first question
+    if (firstQuestion) {
+        scrollToQuestion(firstQuestion);
+    }
+}
+
+// Add event listener for restart confirmation
+document.getElementById('confirmRestartBtn')?.addEventListener('click', restartTest);
+
+// Initialize help buttons
+document.addEventListener('click', (e) => {
+    if (e.target.closest('.help-button')) {
+        const button = e.target.closest('.help-button');
+        const helpContent = document.getElementById(button.getAttribute('aria-controls'));
+        const isExpanded = button.getAttribute('aria-expanded') === 'true';
+
+        button.setAttribute('aria-expanded', !isExpanded);
+        helpContent.hidden = isExpanded;
+    }
+});
+
+function displayResults(scores) {
+    const resultDiv = document.getElementById('result');
+    const submitBtn = document.getElementById('submitBtn');
+
+    if (!resultDiv || !submitBtn) return;
+
+    const { partAScore, partBScore, totalPositiveResponses } = scores;
+    const categoryResult = getCategoryForScore(partAScore);
+
+    resultDiv.innerHTML = `
+        <div class="result-card">
+            <div class="card-header bg-white py-3">
+                <h2 class="card-title text-center mb-0 fw-bold">Rezultatele testului ASRS v1.1</h2>
+            </div>
+
+            <div class="card-body p-4">
+                <!-- Overall Category Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="total-score-section text-center p-4 mb-4"
+                             style="background-color: #f8f9fa; border-radius: 8px;">
+                            <h3 class="h4 mb-3">Rezultat General</h3>
+                            <div class="category-badge text-${categoryResult.color}">
+                                ${categoryResult.category}
+                            </div>
+                            <p class="mb-0 text-muted mt-3">
+                                ${categoryResult.description}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Part A Results -->
+                <div class="score-section mb-4">
+                    <h4 class="fw-bold mb-3">
+                        <i class="fas fa-clipboard-check text-primary me-2"></i>
+                        Partea A (Întrebările 1-6)
+                    </h4>
+                    <div class="score-details p-3 bg-light rounded">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="score-label">Răspunsuri peste prag:</span>
+                            <span class="score-value h4 mb-0">
+                                ${partAScore}/6
+                            </span>
+                        </div>
+                        <div class="progress mb-3" style="height: 15px;">
+                            <div class="progress-bar bg-${categoryResult.color}"
+                                 role="progressbar"
+                                 style="width: ${(partAScore/6)*100}%"
+                                 aria-valuenow="${partAScore}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="6">
+                            </div>
+                        </div>
+                        <div class="score-interpretation">
+                            ${getPartAInterpretation(partAScore)}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Part B Results -->
+                <div class="score-section mb-4">
+                    <h4 class="fw-bold mb-3">
+                        <i class="fas fa-clipboard-list text-secondary me-2"></i>
+                        Partea B (Întrebările 7-18)
+                    </h4>
+                    <div class="score-details p-3 bg-light rounded">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="score-label">Răspunsuri peste prag:</span>
+                            <span class="score-value h4 mb-0">
+                                ${partBScore}/11
+                            </span>
+                        </div>
+                        <div class="progress mb-3" style="height: 15px;">
+                            <div class="progress-bar bg-info"
+                                 role="progressbar"
+                                 style="width: ${(partBScore/11)*100}%"
+                                 aria-valuenow="${partBScore}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="11">
+                            </div>
+                        </div>
+                        <div class="score-interpretation">
+                            ${getPartBInterpretation(partBScore)}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Information -->
+                <div class="alert alert-info mt-4">
+                    <h5 class="alert-heading">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Interpretarea rezultatelor
+                    </h5>
+                    <p class="mb-0">
+                        Acest screening oferă o evaluare inițială a posibilelor simptome ADHD.
+                        Partea A (primele 6 întrebări) este cea mai predictivă pentru diagnosticul ADHD.
+                        Un scor de 4 sau mai multe răspunsuri peste prag în Partea A sugerează o probabilitate ridicată
+                        și necesitatea unei evaluări clinice complete.
+                    </p>
+                </div>
+
+                <!-- Recommendations -->
+                <div class="recommendations mt-4">
+                    <h5 class="fw-bold mb-3">Recomandări:</h5>
+                    ${getRecommendations(partAScore, partBScore)}
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons mt-4">
+                    <button onclick="showRestartWarning()" class="btn btn-danger action-btn">
+                        <i class="fas fa-redo"></i> Începe un nou test
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    resultDiv.style.display = 'block';
+    submitBtn.style.display = 'none';
+
+    // Scroll to results
+    resultDiv.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+    });
+}
+
+// Helper functions for result interpretation
+function getPartAInterpretation(score) {
+    if (score >= 4) {
+        return 'Scorul din Partea A indică o probabilitate ridicată de ADHD și necesitatea unei evaluări clinice complete.';
+    } else if (score >= 2) {
+        return 'Scorul din Partea A sugerează posibile simptome ADHD. Se recomandă discuția cu un specialist.';
+    }
+    return 'Scorul din Partea A nu indică un pattern semnificativ de simptome ADHD.';
+}
+
+function getPartBInterpretation(score) {
+    const percentage = (score / 11) * 100;
+    if (percentage >= 50) {
+        return 'Răspunsurile din Partea B indică prezența unor simptome ADHD suplimentare care pot fi relevante pentru evaluarea clinică.';
+    }
+    return 'Răspunsurile din Partea B indică simptome ADHD ocazionale sau absente în domeniile suplimentare evaluate.';
+}
+
+function getRecommendations(partAScore, partBScore) {
+    const recommendations = [];
+
+    if (partAScore >= 4) {
+        recommendations.push(`
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Se recomandă programarea unei evaluări clinice complete cât mai curând.
+            </div>
+        `);
+    }
+
+    if (partAScore >= 2 || partBScore >= 6) {
+        recommendations.push(`
+            <div class="alert alert-info">
+                <i class="fas fa-user-md me-2"></i>
+                Se recomandă discutarea rezultatelor cu un specialist în sănătate mintală.
+            </div>
+        `);
+    }
+
+    recommendations.push(`
+        <div class="alert alert-success">
+            <i class="fas fa-book-medical me-2"></i>
+            Pentru mai multe informații despre ADHD și opțiuni de tratament,
+            vizitați <a href="https://www.doctoradhd.com" target="_blank">doctoradhd.com</a>
+        </div>
+    `);
+
+    return recommendations.join('');
+}
+</script>
+</body>
+</html>
