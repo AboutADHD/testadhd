@@ -569,86 +569,227 @@ body {
 }
 
 /* CTA Button Styles */
+.cta-section {
+    margin: 2rem 0;
+    text-align: center;
+    position: relative;
+}
+
 .cta-button {
     display: inline-flex;
     align-items: center;
-    gap: 1rem;
-    padding: 0.8rem 1.5rem;
-    background: linear-gradient(145deg, #2196F3, #1976D2);
-    border: none;
-    border-radius: 12px;
+    padding: 0.8rem 2rem;
+    background: linear-gradient(135deg, #2196F3, #1976D2);
+    border-radius: 16px;
     color: white;
     text-decoration: none;
-    transition: all 0.3s ease;
-    width: 100%;
-    max-width: 300px;
+    transform: translateY(0);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
 }
 
+/* Hover Effects */
 .cta-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(33, 150, 243, 0.4);
     color: white;
 }
 
-.cta-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 38px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    font-size: 1.1rem;
+.cta-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
-.cta-content {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    flex: 1;
-    text-align: left;
-}
-
-.cta-title {
-    font-weight: 600;
-    font-size: 1rem;
-    line-height: 1.2;
-}
-
-.cta-time {
-    font-size: 0.8rem;
-    opacity: 0.9;
-}
-
-.cta-arrow {
-    display: flex;
-    align-items: center;
-    opacity: 0.8;
-    transition: transform 0.3s ease;
-}
-
-.cta-button:hover .cta-arrow {
-    transform: translateX(3px);
+.cta-button:hover::before {
     opacity: 1;
 }
 
-@media (max-width: 576px) {
+/* Content Layout */
+.cta-content {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+/* Icon Styles */
+.cta-icon-wrapper {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cta-icon-wrapper i {
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.secondary-icon {
+    position: absolute;
+    right: -20px;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
+}
+
+.cta-button:hover .primary-icon {
+    transform: translateX(-20px);
+    opacity: 0;
+}
+
+.cta-button:hover .secondary-icon {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+/* Text Styles */
+.cta-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+}
+
+.cta-main {
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.cta-sub {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* Pulse Animation */
+.pulse-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 16px;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 15px rgba(33, 150, 243, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(33, 150, 243, 0);
+    }
+}
+
+/* Add floating animation */
+.cta-button {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+/* Optional: Add emphasis shadow on page load */
+.cta-button {
+    animation: emphasize 1s ease-out;
+}
+
+@keyframes emphasize {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.4);
+    }
+    70% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 15px rgba(33, 150, 243, 0);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(33, 150, 243, 0);
+    }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
     .cta-button {
-        padding: 0.7rem 1.2rem;
+        width: 90%;
+        max-width: 320px;
+        padding: 1rem 1.5rem;
     }
 
-    .cta-icon {
-        width: 34px;
-        height: 34px;
-        font-size: 1rem;
+    .cta-content {
+        gap: 1rem;
     }
 
-    .cta-title {
-        font-size: 0.95rem;
+    .cta-icon-wrapper {
+        width: 40px;
+        height: 40px;
     }
 
-    .cta-time {
-        font-size: 0.75rem;
+    .cta-icon-wrapper i {
+        font-size: 1.2rem;
+    }
+
+    .cta-main {
+        font-size: 1.1rem;
+    }
+
+    .cta-sub {
+        font-size: 0.8rem;
+    }
+}
+
+/* Add a subtle shimmer effect */
+.cta-button::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    transform: rotate(45deg);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%) rotate(45deg);
+    }
+    100% {
+        transform: translateX(100%) rotate(45deg);
     }
 }
 
@@ -799,6 +940,544 @@ body {
     background: rgba(33, 150, 243, 0.08);
     transition: all 0.3s ease;
 }
+
+/* Main Container Styles */
+.info-container {
+    padding: 2rem;
+    background: linear-gradient(145deg, #ffffff, #f8f9fa);
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+/* Overview Card Styles */
+.overview-card {
+    margin-bottom: 2rem;
+    padding: 2rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+}
+
+.overview-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.overview-header i {
+    font-size: 2rem;
+    color: #2196F3;
+}
+
+.overview-header h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+    background: linear-gradient(45deg, #2196F3, #1976D2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Info Grid Styles */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.info-card {
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.card-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(33, 150, 243, 0.1);
+    border-radius: 12px;
+    margin-bottom: 1rem;
+}
+
+.card-icon i {
+    font-size: 1.5rem;
+    color: #2196F3;
+}
+
+.info-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.info-card p {
+    margin: 0;
+    color: #666;
+}
+
+.info-card.reference a {
+    color: #2196F3;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Audience Card Styles */
+.audience-card {
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.audience-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.audience-header i {
+    font-size: 1.5rem;
+    color: #4CAF50;
+}
+
+.audience-header h3 {
+    margin: 0;
+    color: #333;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .info-container {
+        padding: 1rem;
+    }
+
+    .overview-card {
+        padding: 1.5rem;
+    }
+
+    .overview-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Test Structure Styles */
+.test-structure-container {
+    margin-top: 3rem;
+}
+
+.components-card, .scoring-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.section-header i {
+    font-size: 1.8rem;
+}
+
+.section-header h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Components Grid */
+.components-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.component-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.component-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.component-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.component-icon i {
+    font-size: 1.2rem;
+    color: #2196F3;
+}
+
+.component-content h4 {
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.component-content p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Important Note */
+.important-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: #fff3cd;
+    border-radius: 12px;
+    margin-top: 2rem;
+}
+
+.important-note i {
+    color: #856404;
+    font-size: 1.2rem;
+}
+
+.important-note p {
+    margin: 0;
+    color: #856404;
+    font-size: 0.95rem;
+}
+
+/* Scoring Styles */
+.scoring-basics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.scoring-stat {
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.stat-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.stat-value.highlight {
+    color: #2196F3;
+}
+
+/* Scoring Tables */
+.scoring-tables {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.scoring-table h4 {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.table-content {
+    background: #f8f9fa;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.8rem 1.2rem;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.table-row:last-child {
+    border-bottom: none;
+}
+
+.table-row.highlight {
+    background: rgba(33, 150, 243, 0.05);
+}
+
+.table-row .answer {
+    color: #555;
+}
+
+.table-row .score {
+    font-weight: 600;
+    color: #333;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .components-card, .scoring-card {
+        padding: 1.5rem;
+    }
+
+    .section-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .section-header h3 {
+        font-size: 1.2rem;
+    }
+
+    .scoring-tables {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Validity Section Styles */
+.validity-container {
+    margin-top: 3rem;
+}
+
+.validity-card, .references-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.validity-intro {
+    margin-bottom: 2rem;
+    color: #666;
+    line-height: 1.6;
+}
+
+/* Validity Stats Styles */
+.validity-stats {
+    background: #f8f9fa;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.stats-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    background: #2196F3;
+    color: white;
+    padding: 1rem;
+    font-weight: 600;
+}
+
+.stat-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.stat-row:last-child {
+    border-bottom: none;
+}
+
+.measure-col {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.version-col {
+    text-align: center;
+    font-weight: 500;
+}
+
+.version-col.highlight {
+    color: #2196F3;
+    font-weight: 600;
+}
+
+/* Tooltip Styles */
+.tooltip {
+    position: relative;
+    cursor: help;
+}
+
+.tooltip i {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.tooltip:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    z-index: 1;
+}
+
+/* Interpretation Note */
+.interpretation-note {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: rgba(33, 150, 243, 0.05);
+    border-radius: 12px;
+    margin-top: 2rem;
+}
+
+.interpretation-note i {
+    color: #2196F3;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+}
+
+.interpretation-note p {
+    margin: 0;
+    color: #555;
+    line-height: 1.6;
+}
+
+/* References Styles */
+.references-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.reference-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.reference-item:hover {
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.reference-number {
+    width: 24px;
+    height: 24px;
+    background: #2196F3;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.reference-content {
+    flex: 1;
+}
+
+.reference-content a {
+    color: #333;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.reference-content a:hover {
+    color: #2196F3;
+}
+
+.authors {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .validity-card, .references-card {
+        padding: 1.5rem;
+    }
+
+    .stats-header, .stat-row {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .version-col {
+        text-align: left;
+        padding-left: 1.5rem;
+    }
+
+    .stats-header .version-col {
+        display: none;
+    }
+
+    .version-col::before {
+        content: attr(data-label);
+        font-weight: normal;
+        margin-right: 0.5rem;
+        color: #666;
+    }
+
+    .reference-item {
+        flex-direction: column;
+    }
+}
 </style>
 </head>
 <body>
@@ -809,20 +1488,21 @@ body {
         <div class="col-12 col-lg-12">
             <h1 class="text-center mt-4 mb-3">Test screening ADHD adulți - ASRS v1.1 (Adult ADHD Self-Report Scale)</h1>
             <!-- <p class="lead text-center mb-4"></p> -->
-             <!-- Mobile CTA Button -->
-            <div class="d-lg-none text-center mb-4">
-                <a href="#first-disclaimer"
-                   class="btn cta-button">
-                    <span class="cta-icon">
-                        <i class="fas fa-clipboard-list"></i>
-                    </span>
-                    <span class="cta-content">
-                        <span class="cta-title">Începe testul acum</span>
-                        <span class="cta-time">Durată: 7 minute</span>
-                    </span>
-                    <span class="cta-arrow">
-                        <i class="fas fa-arrow-right"></i>
-                    </span>
+
+            <!-- CTA Button -->
+            <div class="cta-section">
+                <a href="#first-disclaimer" class="cta-button">
+                    <div class="cta-content">
+                        <div class="cta-icon-wrapper">
+                            <i class="fas fa-clipboard-check primary-icon"></i>
+                            <i class="fas fa-arrow-right secondary-icon"></i>
+                        </div>
+                        <div class="cta-text">
+                            <span class="cta-main">Începe Testul ASRS</span>
+                            <span class="cta-sub">Test gratuit • Durată 7 minute</span>
+                        </div>
+                    </div>
+                    <div class="pulse-ring"></div>
                 </a>
             </div>
 
@@ -895,6 +1575,299 @@ body {
                     </a>
                 </div>
             </div>
+
+            <div class="info-container">
+                <!-- Main Overview Section -->
+                <div class="overview-card">
+                    <div class="overview-header">
+                        <i class="fas fa-info-circle text-primary"></i>
+                        <h2>Despre ASRS v1.1</h2>
+                    </div>
+                    <div class="overview-content">
+                        <p class="lead">
+                            Adult ADHD Self-Report Scale (ASRS v1.1) este un instrument de screening pentru tulburarea de deficit de atenție și hiperactivitate (ADHD) la adulți, constând din două părți. Partea A reprezintă testul principal, în timp ce Partea B oferă informații suplimentare care pot fi discutate cu specialistul dumneavoastră.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Key Information Grid -->
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="card-icon">
+                            <i class="fas fa-tag"></i>
+                        </div>
+                        <h3>Tip</h3>
+                        <p>Instrument de screening</p>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="card-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <h3>An publicare</h3>
+                        <p>2005</p>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="card-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3>Autori</h3>
+                        <p>Ronald C. Kessler et al.</p>
+                    </div>
+
+
+                    <div class="info-card reference">
+                        <div class="card-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <h3>Lucrare seminală</h3>
+                        <a href="https://pubmed.ncbi.nlm.nih.gov/15841682/" target="_blank">
+                            The World Health Organization Adult ADHD Self-Report Scale (ASRS)
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Target Audience Section -->
+                <div class="audience-card">
+                    <div class="audience-header">
+                        <i class="fas fa-user-check"></i>
+                        <h3>Cui se adresează testul</h3>
+                    </div>
+                    <div class="audience-content">
+                        <p><b>Adulți (18+)</b> cu IQ în intervalul de referință <b>(IQ ≥80)</b></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Structure Section -->
+            <div class="test-structure-container">
+                <!-- Components Section -->
+                <div class="components-card">
+                    <div class="section-header">
+                        <i class="fas fa-layer-group text-primary"></i>
+                        <h3>Ce evaluează testul</h3>
+                    </div>
+
+                    <div class="components-grid">
+                        <div class="component-item">
+                            <div class="component-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div class="component-content">
+                                <h4>Inatenție</h4>
+                                <p>Întrebările 1-4, 7-11</p>
+                            </div>
+                        </div>
+
+                        <div class="component-item">
+                            <div class="component-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div class="component-content">
+                                <h4>Hiperactivitate-impulsivitate</h4>
+                                <p>Întrebările 5-6, 12-18</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="important-note">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>ASRS v1.1 este doar un instrument de screening, nu un test diagnostic. Un rezultat pozitiv necesită o evaluare completă din partea unui specialist.</p>
+                    </div>
+                </div>
+
+                <!-- Scoring System -->
+                <div class="scoring-card">
+                    <div class="section-header">
+                        <i class="fas fa-calculator text-success"></i>
+                        <h3>Sistemul de Scoring</h3>
+                    </div>
+
+                    <div class="scoring-basics">
+                        <div class="scoring-stat">
+                            <span class="stat-label">Interval scoring:</span>
+                            <span class="stat-value">0-6 (0-18 pentru testul complet)</span>
+                        </div>
+                        <div class="scoring-stat">
+                            <span class="stat-label">Prag diagnostic:</span>
+                            <span class="stat-value highlight">4+ (pentru partea A)</span>
+                        </div>
+                    </div>
+
+                    <div class="scoring-tables">
+                        <!-- First Group of Questions -->
+                        <div class="scoring-table">
+                            <h4>Pentru întrebările 1-3, 9, 12, 16, 18:</h4>
+                            <div class="table-content">
+                                <div class="table-row">
+                                    <span class="answer">Niciodată</span>
+                                    <span class="score">0</span>
+                                </div>
+                                <div class="table-row">
+                                    <span class="answer">Rareori</span>
+                                    <span class="score">0</span>
+                                </div>
+                                <div class="table-row highlight">
+                                    <span class="answer">Uneori</span>
+                                    <span class="score">1</span>
+                                </div>
+                                <div class="table-row highlight">
+                                    <span class="answer">Adesea</span>
+                                    <span class="score">1</span>
+                                </div>
+                                <div class="table-row highlight">
+                                    <span class="answer">Foarte des</span>
+                                    <span class="score">1</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Second Group of Questions -->
+                        <div class="scoring-table">
+                            <h4>Pentru întrebările 4-8, 10, 11, 13-15, 17:</h4>
+                            <div class="table-content">
+                                <div class="table-row">
+                                    <span class="answer">Niciodată</span>
+                                    <span class="score">0</span>
+                                </div>
+                                <div class="table-row">
+                                    <span class="answer">Rareori</span>
+                                    <span class="score">0</span>
+                                </div>
+                                <div class="table-row">
+                                    <span class="answer">Uneori</span>
+                                    <span class="score">0</span>
+                                </div>
+                                <div class="table-row highlight">
+                                    <span class="answer">Adesea</span>
+                                    <span class="score">1</span>
+                                </div>
+                                <div class="table-row highlight">
+                                    <span class="answer">Foarte des</span>
+                                    <span class="score">1</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Validity Section -->
+            <div class="validity-container">
+                <!-- Main Validity Card -->
+                <div class="validity-card">
+                    <div class="section-header">
+                        <i class="fas fa-chart-line text-primary"></i>
+                        <h3>Validitate ASRS v1.1</h3>
+                    </div>
+
+                    <div class="validity-intro">
+                        <p>Deși ASRS v1.1 poate diagnostica eficient ADHD la adulți, nu poate exclude alte afecțiuni medicale care ar putea impacta diagnosticul ADHD. Validitatea variază în funcție de versiunea utilizată (screening sau completă).</p>
+                    </div>
+
+                    <!-- Validity Stats Grid -->
+                    <div class="validity-stats">
+                        <div class="stats-header">
+                            <div class="measure-col">Măsurătoare</div>
+                            <div class="version-col">6 întrebări</div>
+                            <div class="version-col">18 întrebări</div>
+                        </div>
+
+                        <div class="stat-row">
+                            <div class="measure-col">
+                                <span class="measure">Sensibilitate</span>
+                                <span class="tooltip" data-tooltip="Capacitatea testului de a identifica corect pacienții cu ADHD">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </div>
+                            <div class="version-col highlight">68.7%</div>
+                            <div class="version-col">56.3%</div>
+                        </div>
+
+                        <div class="stat-row">
+                            <div class="measure-col">
+                                <span class="measure">Specificitate</span>
+                                <span class="tooltip" data-tooltip="Capacitatea testului de a identifica corect persoanele fără ADHD">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </div>
+                            <div class="version-col highlight">99.5%</div>
+                            <div class="version-col">98.3%</div>
+                        </div>
+
+                        <div class="stat-row">
+                            <div class="measure-col">
+                                <span class="measure">Acuratețe clasificare</span>
+                                <span class="tooltip" data-tooltip="Raportul dintre predicțiile corecte și numărul total de cazuri">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </div>
+                            <div class="version-col highlight">97.9%</div>
+                            <div class="version-col">96.2%</div>
+                        </div>
+
+                        <div class="stat-row">
+                            <div class="measure-col">
+                                <span class="measure">Kappa</span>
+                                <span class="tooltip" data-tooltip="Gradul de acord între diferite măsurători sau interpretări">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </div>
+                            <div class="version-col highlight">0.76</div>
+                            <div class="version-col">0.58</div>
+                        </div>
+                    </div>
+
+                    <!-- Interpretation Note -->
+                    <div class="interpretation-note">
+                        <i class="fas fa-lightbulb"></i>
+                        <p>ASRS v1.1 este mai eficient în identificarea persoanelor care nu au ADHD decât în identificarea celor care au, dar primele 6 întrebări pot identifica aproape 70% dintre persoanele cu ADHD. Pentru o precizie mai mare, se recomandă versiunea ASRS-5, care identifică corect peste 90% dintre cazuri.</p>
+                    </div>
+                </div>
+
+                <!-- References Section -->
+                <div class="references-card">
+                    <div class="section-header">
+                        <i class="fas fa-book-reader text-info"></i>
+                        <h3>Referințe</h3>
+                    </div>
+
+                    <div class="references-list">
+                        <div class="reference-item">
+                            <div class="reference-number">1</div>
+                            <div class="reference-content">
+                                <a href="https://pubmed.ncbi.nlm.nih.gov/15841682/" target="_blank">
+                                    The World Health Organization Adult ADHD Self-Report Scale (ASRS): a short screening scale for use in the general population
+                                    <span class="authors">Kessler et al., 2005</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="reference-item">
+                            <div class="reference-number">2</div>
+                            <div class="reference-content">
+                                <a href="https://www.hcp.med.harvard.edu/ncs/ftpdir/adhd/background_memo_rev.pdf" target="_blank">
+                                    Adult ADHD Self-Report Scale (ASRS) Version 1.1 Background Information
+                                    <span class="authors">Harvard Medical School</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="reference-item">
+                            <div class="reference-number">3</div>
+                            <div class="reference-content">
+                                <a href="https://peerj.com/articles/324/" target="_blank">
+                                    The Adult ADHD Self-Report Scale (ASRS): utility in college students with attention-deficit/hyperactivity disorder
+                                    <span class="authors">Gray et al., 2014</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Initial disclaimers -->
             <div id="first-disclaimer" class="alert alert-warning alert-dismissible fade show mb-4 text-center" role="alert">
                 <h4 class="alert-heading">Important</h4>
