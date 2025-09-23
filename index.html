@@ -212,7 +212,7 @@
 }
 </script>
 
-<!-- BreadcrumbList JSON-LD Schema -->
+<!-- Streamlined BreadcrumbList JSON-LD Schema -->
 <script type="application/ld+json">
 {
     "@context": "https://schema.org",
@@ -221,19 +221,25 @@
         {
             "@type": "ListItem",
             "position": 1,
-            "name": "Acasă",
-            "item": "https://www.testadhd.ro"
-        },
-        {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Test ADHD Adulți",
+            "name": "Despre ASRS",
             "item": "https://www.testadhd.ro/#info-section"
         },
         {
             "@type": "ListItem",
+            "position": 2,
+            "name": "Structură & Scoring",
+            "item": "https://www.testadhd.ro/#scoring-section"
+        },
+        {
+            "@type": "ListItem",
             "position": 3,
-            "name": "ASRS v1.1 Screening",
+            "name": "Validitate",
+            "item": "https://www.testadhd.ro/#validity-section"
+        },
+        {
+            "@type": "ListItem",
+            "position": 4,
+            "name": "Începe Testul",
             "item": "https://www.testadhd.ro/#first-disclaimer"
         }
     ]
@@ -2338,6 +2344,79 @@ body {
     box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
 }
 
+/* Enhanced Breadcrumb Styles */
+.breadcrumb-enhanced {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.breadcrumb-enhanced .breadcrumb-item {
+    font-size: 0.9rem;
+}
+.breadcrumb-link {
+    color: #495057;
+    text-decoration: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 500;
+}
+.breadcrumb-link:hover {
+    color: #2196F3;
+    background: rgba(33, 150, 243, 0.1);
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+.breadcrumb-link i {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+.breadcrumb-cta {
+    background: #2196F3;
+    color: white !important;
+    font-weight: 600;
+}
+.breadcrumb-cta:hover {
+    background: #1976D2;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+}
+.breadcrumb-enhanced .breadcrumb-item + .breadcrumb-item::before {
+    content: "›";
+    color: #6c757d;
+    font-weight: bold;
+    padding: 0 0.5rem;
+}
+@media (max-width: 768px) {
+    .breadcrumb-enhanced {
+        padding: 0.5rem 0.75rem;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+    .breadcrumb-enhanced .breadcrumb-item {
+        display: inline-flex;
+        font-size: 0.85rem;
+    }
+    .breadcrumb-link {
+        padding: 0.3rem 0.5rem;
+        gap: 0.3rem;
+    }
+    .breadcrumb-link span {
+        display: none;
+    }
+    .breadcrumb-link i {
+        margin: 0;
+    }
+}
+
 /* FAQ Styles */
 .faq-list {
     display: flex;
@@ -2414,19 +2493,28 @@ body {
 </head>
 <body>
 <div class="container">
-    <!-- Breadcrumb Navigation -->
+    <!-- Enhanced Breadcrumb Navigation matching Quick Nav sections -->
     <nav aria-label="breadcrumb" class="mt-3">
-        <ol class="breadcrumb">
+        <ol class="breadcrumb breadcrumb-enhanced">
             <li class="breadcrumb-item">
-                <a href="https://www.testadhd.ro">
-                    <i class="fas fa-home"></i> Acasă
+                <a href="#info-section" class="breadcrumb-link" data-section="info">
+                    <i class="fas fa-circle-info"></i> Despre ASRS
                 </a>
             </li>
             <li class="breadcrumb-item">
-                <a href="#info-section">Test ADHD Adulți</a>
+                <a href="#scoring-section" class="breadcrumb-link" data-section="scoring">
+                    <i class="fas fa-calculator"></i> Structură & Scoring
+                </a>
             </li>
-            <li class="breadcrumb-item active" aria-current="page">
-                ASRS v1.1 Screening
+            <li class="breadcrumb-item">
+                <a href="#validity-section" class="breadcrumb-link" data-section="validity">
+                    <i class="fas fa-chart-line"></i> Validitate
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="#first-disclaimer" class="breadcrumb-link breadcrumb-cta" data-section="test">
+                    <i class="fas fa-play"></i> Începe Testul
+                </a>
             </li>
         </ol>
     </nav>
@@ -4027,6 +4115,87 @@ document.addEventListener('DOMContentLoaded', () => {
             faqItem.classList.toggle('active', !isActive);
         });
     });
+    
+    // Enhanced Breadcrumb navigation functionality
+    document.querySelectorAll('.breadcrumb-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (href.startsWith('#')) {
+                e.preventDefault();
+                const targetElement = document.querySelector(href);
+                if (targetElement) {
+                    // Smooth scroll to target with offset for fixed headers
+                    const offset = 80;
+                    const elementPosition = targetElement.offsetTop;
+                    const offsetPosition = elementPosition - offset;
+                    
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Update breadcrumb active states
+                    updateBreadcrumbStates(this.getAttribute('data-section'));
+                }
+            }
+        });
+    });
+    
+    // Function to update breadcrumb active states based on scroll position
+    function updateBreadcrumbStates(activeSection) {
+        document.querySelectorAll('.breadcrumb-link').forEach(link => {
+            const linkSection = link.getAttribute('data-section');
+            const breadcrumbItem = link.closest('.breadcrumb-item');
+            
+            if (linkSection === activeSection) {
+                breadcrumbItem.classList.add('active');
+                breadcrumbItem.setAttribute('aria-current', 'page');
+                link.style.color = '#2196F3';
+                link.style.background = 'rgba(33, 150, 243, 0.15)';
+            } else {
+                breadcrumbItem.classList.remove('active');
+                breadcrumbItem.removeAttribute('aria-current');
+                link.style.color = '';
+                link.style.background = '';
+            }
+        });
+    }
+    
+    // Update breadcrumb states on scroll
+    let breadcrumbUpdateTimeout;
+    window.addEventListener('scroll', () => {
+        if (breadcrumbUpdateTimeout) {
+            clearTimeout(breadcrumbUpdateTimeout);
+        }
+        
+        breadcrumbUpdateTimeout = setTimeout(() => {
+            const sections = ['info-section', 'scoring-section', 'validity-section', 'first-disclaimer'];
+            const currentSection = getCurrentVisibleSection(sections);
+            
+            if (currentSection) {
+                const sectionMap = {
+                    'info-section': 'info',
+                    'scoring-section': 'scoring', 
+                    'validity-section': 'validity',
+                    'first-disclaimer': 'test'
+                };
+                updateBreadcrumbStates(sectionMap[currentSection]);
+            }
+        }, 100);
+    });
+    
+    // Helper function to determine which section is currently visible
+    function getCurrentVisibleSection(sections) {
+        const scrollPosition = window.scrollY + 150;
+        
+        for (let i = sections.length - 1; i >= 0; i--) {
+            const section = document.getElementById(sections[i]);
+            if (section && section.offsetTop <= scrollPosition) {
+                return sections[i];
+            }
+        }
+        return sections[0];
+    }
 });
 </script>
 </body>
