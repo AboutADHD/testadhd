@@ -1,118 +1,166 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code working in this repo. Detailed context lives in `docs/` —
+read those on demand (see [Reference documents](#reference-documents)); they are not
+loaded every session.
 
-## Project Overview
+## Project overview
 
-`testadhd.ro` is a free, privacy-first ADHD screening tool for adults, built around the
-**ASRS v1.1** questionnaire (Adult ADHD Self-Report Scale, World Health Organisation).
-It was migrated from a single static `index.html` to a modern **Next.js 16 (App Router)**
-application. The interface is in **Romanian**.
+`testadhd.ro` — a free, privacy-first **ADHD screening tool for adults** built on the
+**ASRS v1.1** questionnaire (WHO). Romanian UI. Next.js 16 App Router, React 19, TS,
+Tailwind v4. **100% client-side scoring — no backend, no database, no cookies, no
+analytics, no data ever transmitted.** Single landing page. See `README.md` for the
+product/feature summary (Romanian).
 
-**Key characteristics**
-- Next.js 16 + React 19 + TypeScript, App Router, React Server Components.
-- Tailwind CSS v4 (CSS-first `@theme` tokens) + `motion` for transitions.
-- 100% client-side scoring — **no data is collected, stored or transmitted**. No cookies,
-  no analytics, no backend/database.
-- Runs as a Node process on **port 9460**, managed by an **isolated PM2** instance, behind
-  an **nginx reverse proxy** terminating the Cloudflare Origin TLS.
+## Code intelligence tools — use BEFORE Grep/Glob/Read
 
-## Architecture
+This repo ships two **complementary** tools (both gitignored local artifacts). They are
+faster, cheaper, and give structural context file-scanning cannot. Full guide:
+`docs/code-intelligence.md`.
 
-### App Router structure (`app/`)
-- `layout.tsx` — root layout: `next/font` (Sora, IBM Plex Sans, IBM Plex Mono), the global
-  metadata object, site-wide JSON-LD (`Organization`, `WebSite`), skip-link.
-- `page.tsx` — the single landing page: assembles all sections and page-level JSON-LD
-  (`MedicalWebPage`/`WebApplication`, `FAQPage`, `BreadcrumbList`).
-- `globals.css` — the "Calm focus" design system: Tailwind v4 `@theme` tokens (colours,
-  fonts, radii, shadows), base layer, reduced-motion handling, ambient keyframes.
-- `manifest.ts`, `robots.ts`, `sitemap.ts` — metadata routes (compile to
-  `/manifest.webmanifest`, `/robots.txt`, `/sitemap.xml`). These replace the old hand-written
-  static files.
-- `not-found.tsx` — branded 404 (noindex).
-- `icon.svg`, `apple-icon.png` — favicons (file-based metadata conventions).
+- **code-review-graph** (MCP server, live, auto-updates via a PostToolUse hook) — the
+  authoritative structural graph. Use its MCP tools FIRST:
+  - `detect_changes` — review changes (risk-scored). `get_review_context` — token-efficient snippets.
+  - `get_impact_radius` / `get_affected_flows` — blast radius / impacted execution paths.
+  - `query_graph` — trace `callers_of`/`callees_of`/`imports_of`/`importers_of`/`tests_for`.
+  - `semantic_search_nodes` — find functions/classes by name/keyword (FTS fallback; no embeddings).
+  - `get_architecture_overview` / `list_communities` — high-level structure.
+  - `refactor_tool` — plan renames, find dead code.
+- **codesight** (static map in `.codesight/*.md`) — skim `.codesight/CODESIGHT.md` for
+  instant orientation. Regenerate with `codesight` (from repo root) after significant changes.
+  **NEVER run `codesight --init`** (it overwrites this `CLAUDE.md`, `.cursorrules`, etc.) or
+  `codesight --hook`.
 
-### Data & logic (`lib/`) — the clinical core, framework-free and unit-testable
-- `asrs.ts` — the 18 ASRS v1.1 questions (verbatim Romanian), the 5-point Likert scale, and
-  per-question metadata: `part` (A/B), `domain` (inatenție / hiperactivitate) and
-  `thresholdIndex`.
-- `scoring.ts` — pure scoring engine: `calculateScores`, level bands, interpretations and
-  conditional recommendations.
-- `content.ts` — all editorial/clinical copy (about, scoring tables, validity stats,
-  references, FAQ, disclaimers, progress messages, section anchors, nav).
-- `structured-data.ts` — JSON-LD builders.
-- `site.ts` — single source of truth for URLs, brand strings, SEO defaults, external links.
-- `cn.ts` — tiny className joiner.
+Fall back to Grep/Glob/Read only when the graph/map don't cover what you need. The graph is
+authoritative when the two disagree (it auto-refreshes; codesight does not).
 
-### Components (`components/`)
-- Static/presentational (Server Components): `Hero`, `SiteHeader`, `SiteFooter`,
-  `ConfidentialBanner`, `AboutSection`, `ScoringSection`, `ValiditySection`, `Downloads`,
-  `Resources`, `Faq`, `Section`, `BrandMark`, `JsonLd`.
-- Client (interactivity/animation): `Reveal`, `SiteHeader` (scroll-spy), `Hero` (entrance).
-- `components/test/` — the interactive questionnaire: `Questionnaire` (state orchestrator),
-  `QuestionCard`, `ProgressTracker`, `ScoreBar`, `Results`, `TestSection`.
+## Tech stack
 
-## ASRS v1.1 scoring — IMPORTANT
+- **Next.js 16** (App Router, React Server Components) · **React 19** · **TypeScript**
+  (strict, `noUncheckedIndexedAccess`, `verbatimModuleSyntax`).
+- **Tailwind CSS v4** — CSS-first; tokens in `app/globals.css` `@theme`. **No
+  `tailwind.config.js`.** Configured only via `@tailwindcss/postcss`.
+- **`motion`** (^12) for animation · **`next/font`** (Sora, IBM Plex Sans, IBM Plex Mono).
+- **ESM** (`type: "module"`). **Node 22** (`.nvmrc`; `engines` floor is `>=20.9.0`).
+- Runtime: **PM2 (isolated)** + **nginx** + **Cloudflare Origin TLS**, port **9460**.
 
-The official ASRS v1.1 uses **two shaded zones**, encoded as `thresholdIndex` per question:
-- Questions **1-3, 9, 12, 16, 18** count from **"Uneori"** (index 2) upward.
-- All other questions count only from **"Adesea"** (index 3) upward.
-
-`isShaded()` in `lib/asrs.ts` applies this. **Part A** (questions 1-6) is the screener; a
-count of **≥ 4 of 6** shaded answers is a positive screen (`PART_A_POSITIVE_CUTOFF`). The
-legacy single-file app used a uniform "Uneori+" threshold for all 18 items (a bug that
-over-counted); this implementation follows the official scale and the on-page scoring tables.
-
-Levels (from Part A): `≥4` → "Nivel ridicat", `≥2` → "Nivel moderat", else "Nivel scăzut".
-
-## Development
+## Commands
 
 ```bash
-npm install            # install dependencies
-npm run dev            # dev server on http://localhost:9460
-npm run build          # production build (Turbopack) — also type-checks
-npm run start          # production server on 0.0.0.0:9460
-npm run lint           # ESLint (flat config, eslint-config-next 16 native)
-npm run typecheck      # tsc --noEmit
-node scripts/generate-icons.mjs   # regenerate PWA/Apple PNG icons from the brand mark
+npm install
+npm run dev          # dev server, http://localhost:9460
+npm run build        # production build; type-checks as a side effect
+npm run start        # prod server on 0.0.0.0:9460
+npm run lint         # ESLint (flat config)
+npm run typecheck    # tsc --noEmit
+node scripts/generate-icons.mjs       # regenerate PWA/Apple PNG icons (run from repo root)
+./pm2-isolated.sh start|reload|restart|stop|status|logs   # ALWAYS manage PM2 via this wrapper
+npm ci && npm run build && ./pm2-isolated.sh reload       # deploy
 ```
 
-## Deployment
+**There is NO test runner** — no `test` script, no test deps, zero test files. **Never run
+`npm test`.** `components/test/` is the questionnaire UI, not tests. Verify with
+**`npm run build` + `npm run lint` + `npm run typecheck`**.
 
-The app is served by an **isolated PM2** instance (so it never collides with the other apps
-on this server) behind nginx.
+## Project structure
 
-- **Port:** 9460 (Next.js `next start`, fork mode, single instance).
-- **PM2 home:** `./.pm2-isolated` (unique per app). **Namespace:** `testadhd`.
-- **Process name:** `testadhd-prod` (see `ecosystem.config.cjs`).
-- **Always manage PM2 through the wrapper** so `PM2_HOME` is correct:
-  ```bash
-  ./pm2-isolated.sh start|reload|restart|stop|status|logs
-  ```
-- **Boot persistence:** `systemd` unit `pm2-testadhd.service` runs `pm2 resurrect` against the
-  isolated `PM2_HOME` on boot (`systemctl status pm2-testadhd`).
-- **nginx:** `/etc/nginx/sites-generated/testadhd.ro.conf` reverse-proxies
-  `www.testadhd.ro` → `127.0.0.1:9460`, redirects HTTP→HTTPS and apex
-  `testadhd.ro` → `https://www.testadhd.ro`, using the existing **Cloudflare Origin**
-  certificate (`/etc/nginx/nginx-rc-compat/testadhd-ro.d/server.{crt,key}`).
-- **Headers:** security headers are split — nginx sets `X-Frame-Options`,
-  `X-Content-Type-Options`, `X-XSS-Protection`, `Referrer-Policy` globally; the app
-  (`next.config.ts`) sets `Content-Security-Policy`, `Strict-Transport-Security` and
-  `Permissions-Policy`.
-- **No PHP:** this domain has no php-fpm pool and the vhost has no `fastcgi_pass`.
-
-### Deploy a change
-```bash
-npm ci && npm run build && ./pm2-isolated.sh reload
+```
+app/          App Router: layout.tsx (fonts, metadata, site-wide JSON-LD, skip-link),
+              page.tsx (assembles the page + page-level JSON-LD), globals.css (design
+              tokens), manifest.ts/robots.ts/sitemap.ts (metadata routes → replace static
+              files), not-found.tsx, icon.svg/apple-icon.png (file-based icons)
+components/   Presentational sections + shared primitives (Section, Reveal, BrandMark, JsonLd)
+components/test/   The interactive questionnaire (the only stateful feature)
+lib/          Framework-free core (single source of truth): asrs.ts + scoring.ts (clinical),
+              content.ts (all copy), site.ts (URLs/brand/SEO), structured-data.ts (JSON-LD),
+              cn.ts
+public/       OG image, ASRS PDF, PWA icons     scripts/  generate-icons.mjs (only file)
+docs/         Detailed reference docs (progressive disclosure)
 ```
 
-## Important notes
-- **Privacy:** never add analytics, cookies, persistence or any network call that transmits
-  answers. Scoring must stay 100% client-side.
-- **Clinical accuracy:** the ASRS wording and the two-zone scoring are clinical content —
-  change `lib/asrs.ts` / `lib/scoring.ts` only with care, and keep the on-page scoring tables
-  in `lib/content.ts` consistent with the thresholds.
-- **Language:** all user-facing copy is Romanian (with diacritics — fonts load the
-  `latin-ext` subset).
-- **SEO:** structured data, canonical (`https://www.testadhd.ro`), OG/Twitter, sitemap and
-  robots are generated from `lib/site.ts` — update brand/URL there.
+## Architecture & key patterns
+
+Detail: `docs/architecture.md`.
+
+- **RSC-by-default.** Only `Reveal`, `SiteHeader`, `Hero`, and `components/test/*` are
+  `"use client"`. Keep all other components server-only (no hooks/handlers).
+- **Edit content/data in `lib/`, not JSX.** All copy is in `content.ts`; all URLs/brand/SEO
+  defaults in `site.ts`; clinical logic/data in `asrs.ts`/`scoring.ts`.
+- **`Section` + `Reveal` are the load-bearing primitives.** Wrap section content in
+  `Section`; wrap reveal-on-scroll blocks in `Reveal` (it no-ops to a plain `<div>` under
+  reduced motion — the `className` you pass must lay out correctly without the wrapper).
+- **Use design tokens via Tailwind utilities** (`text-ink`, `bg-surface`, `text-primary`,
+  `bg-accent`, …); don't hardcode hex. Coral `--color-accent` is reserved for the primary
+  CTA only. Use `.tabular` for numeric values.
+- **SEO:** metadata in `layout.tsx`; JSON-LD via the `<JsonLd>` component (site-wide schemas
+  in `layout.tsx`, page schemas in `page.tsx`); `manifest/robots/sitemap` are TS metadata
+  routes. Change brand/URL in `lib/site.ts`.
+- **Questionnaire** (`components/test/Questionnaire.tsx`) holds all state; `calculateScores`
+  is safe on partial answer maps (used for live progress, not a live score band).
+
+## ASRS v1.1 scoring — IMPORTANT (clinical)
+
+Detail + the content↔engine consistency contract: `docs/asrs-scoring.md`.
+
+- **Two-zone thresholds** (`thresholdIndex` in `lib/asrs.ts`): questions **1, 2, 3, 9, 12,
+  16, 18** count from **"Uneori"** (index 2); all others only from **"Adesea"** (index 3).
+  `isShaded()` = `responseIndex >= thresholdIndex`.
+- **Scoring is a COUNT of shaded items** (0/1 per question), **NOT a sum of Likert values.**
+  Ranges: Part A 0-6, Part B 0-12, total 0-18, each domain (inatenție / hiperactivitate) 0-9.
+- **Levels derive ONLY from Part A:** `≥4` → ridicat (positive screen), `≥2` → moderat,
+  else scăzut. Part B (`PART_B_ELEVATED_CUTOFF=6`) affects only recommendations, not level.
+- **NEVER flatten `thresholdIndex` to a uniform value** — that reintroduces the legacy
+  over-counting bug the migration fixed.
+- **Keep `lib/content.ts` tables consistent with the engine.** When you change a question's
+  zone or domain, or a cutoff, edit `asrs.ts`/`scoring.ts` AND the matching
+  `SCORING_TABLES`/`COMPONENTS` copy in `content.ts`. The moderate `≥2` threshold is an
+  inline literal in **three** places in `scoring.ts` — change all together.
+
+## Conventions (non-obvious)
+
+- **Commits:** Conventional Commits with scopes — `feat(lib|ui|app|test|assets|seo)`,
+  `chore(deploy)`, `build`, `docs`, `chore`.
+- **`AnswerMap` presence checks MUST use `=== undefined`** — `0` ("Niciodată") is a valid,
+  falsy answer; truthiness checks silently drop it.
+- **`cn()` (`lib/cn.ts`) is NOT `tailwind-merge`** — it's a plain join; it does not dedupe
+  or resolve conflicting Tailwind classes (source order wins).
+- **`next/font` subsets MUST include `latin-ext`** — required for Romanian diacritics.
+- **ESLint:** use the native `eslint-config-next` flat arrays; do **not** reintroduce
+  FlatCompat/eslint-plugin-react (crashes under ESLint 9).
+
+## Gotchas & warnings
+
+- **NEVER add analytics, cookies, persistence, or any network call that transmits answers.**
+  Scoring must stay 100% client-side. This is the product's core promise.
+- **Header split:** the app (`next.config.ts`) sets only CSP, HSTS, Permissions-Policy;
+  nginx sets `X-Frame-Options`, `X-Content-Type-Options`, `X-XSS-Protection`,
+  `Referrer-Policy` globally. **Don't duplicate** the nginx-owned headers in the app.
+- **PM2:** always go through `./pm2-isolated.sh` (it pins `PM2_HOME=./.pm2-isolated`).
+  Calling `pm2` directly hits the wrong daemon.
+- **`generate-icons.mjs` uses relative paths** — run it from the repo root. `app/icon.svg`
+  is hand-maintained and is NOT produced by the script.
+- **`medicalWebPageSchema()` sets `dateModified: new Date()`** — its JSON-LD output is
+  non-deterministic per build/request (expected, not a bug).
+- The "Turbopack" build is just the Next 16 default — `build` has **no `--turbopack` flag**;
+  don't add one expecting a behavior change.
+- Boot persistence (systemd `pm2-testadhd.service`) and the nginx vhost are **out of repo**
+  — configured on the host.
+
+## Workflow
+
+- **Branch:** `main` is the working branch. Make focused commits per the convention above.
+- **Deploy:** `npm ci && npm run build && ./pm2-isolated.sh reload` from the repo root.
+  Detail: `docs/deployment.md`.
+
+## Reference documents
+
+Read on demand (progressive disclosure — detailed, not needed every session):
+
+- `docs/architecture.md` — App Router shell, RSC/client boundary, design system, shared
+  primitives, SEO/structured data, the interactive questionnaire, icon generation.
+- `docs/asrs-scoring.md` — the clinical scoring engine, every constant, the algorithm, and
+  the `content.ts`↔engine consistency contract. **Read before editing scoring or scale copy.**
+- `docs/deployment.md` — build/runtime config, headers, isolated PM2, nginx/Cloudflare,
+  deploy steps, git/migration history.
+- `docs/code-intelligence.md` — full guide to code-review-graph + codesight (config,
+  commands, complementarity, no-interference setup).

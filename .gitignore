@@ -45,3 +45,8 @@ Thumbs.db
 *.swo
 *~
 .vercel
+# Code-intelligence artifacts (regenerated locally; see docs/code-intelligence.md)
+# code-review-graph: binary knowledge-graph DB (also self-ignored by its own .gitignore)
+.code-review-graph/
+# codesight: static markdown context map, regenerated on demand with `codesight`
+/.codesight/

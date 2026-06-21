@@ -1,0 +1,19 @@
+node_modules/
+.next/
+dist/
+build/
+.venv/
+.env.local
+.env.*.local
+*.log
+logs/
+.sass-cache/
+coverage/
+.nyc_output/
+.cache/
+.pm2/
+playwright-report/
+test-results/
+# code-review-graph binary DB — query it via MCP tools, never read raw.
+# (.codesight/*.md is intentionally NOT ignored — those maps are meant for Claude.)
+.code-review-graph/

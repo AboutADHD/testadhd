@@ -1,0 +1,8 @@
+# codesight scan scope — keep it focused on source so codesight and code-review-graph
+# never index each other or build/runtime artifacts. See docs/code-intelligence.md.
+.code-review-graph/
+.codesight/
+.next/
+.pm2-isolated/
+logs/
+node_modules/
