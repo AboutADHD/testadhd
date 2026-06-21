@@ -1,86 +1,91 @@
-# Test ADHD pentru Adulți - Scala ASRS v1.1
+# Test ADHD adulți — ASRS v1.1 · [testadhd.ro](https://www.testadhd.ro)
 
-Acesta este un proiect de testare și autoevaluare pentru ADHD la adulți, utilizând Scala **ASRS v1.1 (Adult ADHD Self-Report Scale)**. Proiectul este complet open-source și poate fi utilizat atât în scop personal, cât și pentru îmbunătățirea comunității de codare open-source.
+Test online **gratuit** și **100% confidențial** pentru screening-ul ADHD la adulți, folosind
+scala **ASRS v1.1** (Adult ADHD Self-Report Scale) dezvoltată de Organizația Mondială a
+Sănătății. Rezultate instantanee, fără colectarea datelor — totul se calculează local, în
+browser.
 
-## Disclaimer important
-
-Este important de reținut că rezultatul obținut este pur informativ, în scop de screening și NU este menit să ofere un diagnostic. Utilizatorii sunt încurajați să consulte un profesionist calificat pentru o evaluare cuprinzătoare.
-
-## Descrierea proiectului
-
-Scala ASRS v1.1 este un instrument utilizat pentru screening-ul ADHD la adulți. Acest proiect web permite utilizatorilor să completeze testul ASRS și să obțină un scor bazat pe răspunsurile lor, oferind o estimare inițială a prezenței trăsăturilor ADHD.
-
-Proiectul asigură **confidențialitate totală** - nu colectăm și nu stocăm nicio informație despre utilizatori.
+Aplicație **Next.js 16** (App Router), succesoarea variantei statice dintr-un singur fișier.
 
 ## Caracteristici
 
-- **Test complet confidențial** - Nu colectăm date personale
-- **Interfață prietenoasă și ușor de utilizat**
-- **Scor instantaneu** - Obțineți rezultate imediat după completarea testului
-- **Răspunsuri evidențiate pentru pragul ADHD** - Opțiunile care depășesc pragul pentru ADHD sunt evidențiate vizual
-- **Bară de progres** - Utilizatorii sunt informați în timp real despre progresul lor
-- **Disponibil în română**
+- **18 întrebări** ASRS v1.1 (Partea A — screening, 6 întrebări; Partea B — 12 întrebări).
+- **Scoring oficial cu două zone** (vezi mai jos) — corect din punct de vedere clinic.
+- **Confidențial**: zero cookie-uri, zero analytics, zero backend. Răspunsurile nu părăsesc
+  dispozitivul.
+- **SEO**: metadate complete, date structurate JSON-LD (MedicalWebPage, FAQPage,
+  BreadcrumbList, Organization, WebSite), sitemap, robots, OpenGraph/Twitter.
+- **PWA**: manifest + iconițe; **accesibil** (focus vizibil, `prefers-reduced-motion`, ARIA).
+- UI/UX modern cu tranziții fluide (`motion`) și un sistem de progres prietenos cu ADHD.
 
-## Cum să contribui
+## Tehnologii
 
-Proiectul este open-source și oricine dorește să contribuie este binevenit. Dacă aveți idei de îmbunătățire sau vreți să raportați un bug, urmați pașii de mai jos.
+| Strat        | Tehnologie                                            |
+| ------------ | ----------------------------------------------------- |
+| Framework    | Next.js 16 (App Router, RSC) · React 19 · TypeScript  |
+| Stilizare    | Tailwind CSS v4 (`@theme`) · `motion`                 |
+| Tipografie   | Sora · IBM Plex Sans · IBM Plex Mono (`next/font`)     |
+| Rulare       | Node 22 · PM2 (izolat) · nginx (reverse proxy)        |
 
-### 1. Fork & Clone
-
-Faceți un **fork** al acestui repository și clonați-l local:
-
-```bash
-git clone https://github.com/hodorogandrei/testadhd.git
-cd testadhd
-```
-
-2. Creați o ramură nouă (fork)
-
-Pentru a contribui cu modificările dvs., creați o ramură nouă:
+## Dezvoltare
 
 ```bash
-git checkout -b numele-feature-ului
+npm install
+npm run dev        # http://localhost:9460
+npm run build      # build de producție (Turbopack) + verificare de tipuri
+npm run start      # server de producție pe 0.0.0.0:9460
+npm run lint       # ESLint
+npm run typecheck  # tsc --noEmit
 ```
 
-4. Testați și verificați modificările
+Iconițele PWA/Apple se regenerează din marca brandului cu:
 
-Încărcați index.html într-un browser și verificați că modificările dvs. funcționează corespunzător. Asigurați-vă că:
-- Nu există erori în consolă.
-- Modificările sunt compatibile cu toate funcționalitățile existente.
-- Confidențialitatea utilizatorului rămâne intactă.
+```bash
+node scripts/generate-icons.mjs
+```
 
-5. Trimiteți un Pull Request
+## Structură
 
-După ce modificările sunt complete, trimiteți un Pull Request (PR) și adăugați o descriere clară a ceea ce ați adăugat sau modificat.
+```
+app/            # App Router: layout, pagină, globals.css, manifest/robots/sitemap, 404, iconițe
+components/     # UI (secțiuni statice) + components/test/ (chestionarul interactiv)
+lib/            # asrs.ts (întrebări), scoring.ts (calcul), content.ts, site.ts, structured-data.ts
+public/         # imagine OG, PDF-ul scalei ASRS, iconițe PWA
+scripts/        # generator de iconițe
+ecosystem.config.cjs, pm2-isolated.sh   # rulare în producție (PM2 izolat)
+```
 
-## Structura proiectului
+## Scoring ASRS v1.1
 
-Pentru a ajuta contribuabilii să înțeleagă mai bine structura proiectului, iată o descriere a principalelor secțun:
-- `index.html`: Fișierul HTML principal care conține structura paginii, elementele vizuale și codul Javascript.
-- secțiunea CSS: Stiluri CSS personalizate pentru aplicație, inclusiv animații și evidențieri ale elementelor pragului ADHD.
-- secțiunea Javascript JavaScript-ul principal care gestionează logica aplicației (generarea întrebărilor, gestionează bara de progres, evidențierea întrebărilor necompletate, calculul scorurilor și interpretarea acestora
-- `README.md`: Acest fișier, care descrie proiectul și oferă îndrumări despre cum se poate contribui.
+Scala oficială folosește **două zone** de scor:
 
-## Cum funcționează
+- Întrebările **1-3, 9, 12, 16, 18** punctează de la **„Uneori”** în sus.
+- Restul întrebărilor punctează doar de la **„Adesea”** în sus.
 
-1. Întrebările sunt generate automat folosind o listă predefinită în `index.html`. Fiecare întrebare are un prag de răspuns care poate semnala ADHD.
-2. Bara de progres actualizează utilizatorul în timp real în legătură cu progresul testului.
-3. Eroare pentru întrebările necompletate: La apăsarea butonului de trimitere, utilizatorul este informat despre întrebările la care nu a răspuns.
-4. Răspunsurile care depășesc pragul sunt contorizate și prezentate într-un raport general de calcul.
-5. Scorul calculat în final poate sugera prezența sau absența trăsăturilor ADHD.
+**Partea A** (întrebările 1-6) este testul de screening: un scor de **≥ 4 din 6** indică o
+probabilitate ridicată de ADHD și necesitatea unei evaluări clinice. Logica trăiește în
+`lib/asrs.ts` și `lib/scoring.ts`.
 
-## Cerințe pentru configurare locală
+## Deploy
 
-Acest proiect **nu** necesită un backend sau o bază de date, fiind complet static. Încărcați fișierul index.html într-un browser pentru a rula aplicația.
+Aplicația rulează ca proces Node pe portul **9460**, gestionat de o instanță **PM2 izolată**
+(`PM2_HOME=./.pm2-isolated`, namespace `testadhd`), în spatele unui **reverse proxy nginx** care
+termină certificatul **Cloudflare Origin** și păstrează redirect-ul apex → `www`.
 
-## Confidențialitate și securitate
+```bash
+npm ci && npm run build && ./pm2-isolated.sh reload
+```
 
-Acest proiect nu colectează date despre utilizatori. Codul poate fi verificat de oricine pentru a se asigura că nu există funcționalități ascunse de colectare a datelor.
+Vezi [`CLAUDE.md`](./CLAUDE.md) pentru detalii complete de infrastructură.
 
-Pentru orice întrebări sau asistență, îmi puteți scrie un email la `contact@aboutadhd.ro` sau trimite un mesaj în cadrul secțiunii `Issues` de pe GitHub.
+## Confidențialitate
 
-## Licență
+Aplicația nu colectează, nu stochează și nu transmite nicio informație personală. Toate
+calculele se efectuează local, în browser.
 
-Acest proiect este licențiat sub licența Creative Commons Attribution 4.0 International. Puteți folosi, distribui și modifica acest cod cu condiția să acordați credit autorului original.
+## Licență & atribuiri
 
-Sperăm că acest proiect vă va fi de folos și că veți contribui la îmbunătățirea lui!
+- Conținut sub licența [Creative Commons Attribution 4.0](https://creativecommons.org/licenses/by/4.0/).
+- ADHD-ASRS Screener v1.1 © World Health Organisation. Acest instrument este destinat
+  **exclusiv** screening-ului informativ și **nu** este un instrument de diagnostic.
+- Resurse: [despreadhd.ro](https://www.despreadhd.ro) · [doctoradhd.com](https://www.doctoradhd.com).
