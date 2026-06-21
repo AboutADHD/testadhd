@@ -1,0 +1,42 @@
+{
+  "name": "testadhd-ro",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Test ADHD adulți (screening) — ASRS v1.1 (Adult ADHD Self-Report Scale). Aplicație Next.js, 100% client-side, fără colectare de date.",
+  "author": "Test ADHD România <contact@aboutadhd.ro>",
+  "license": "CC-BY-4.0",
+  "homepage": "https://www.testadhd.ro",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "dev": "next dev -p 9460",
+    "build": "next build",
+    "start": "next start -p 9460 -H 0.0.0.0",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "pm2:start": "./pm2-isolated.sh start",
+    "pm2:reload": "./pm2-isolated.sh reload",
+    "pm2:restart": "./pm2-isolated.sh restart",
+    "pm2:stop": "./pm2-isolated.sh stop",
+    "pm2:logs": "./pm2-isolated.sh logs",
+    "pm2:status": "./pm2-isolated.sh status"
+  },
+  "dependencies": {
+    "next": "16.2.9",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "motion": "^12.40.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.1",
+    "@types/node": "^26.0.0",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.0",
+    "eslint-config-next": "16.2.9",
+    "tailwindcss": "^4.3.1",
+    "typescript": "^6.0.3"
+  }
+}
