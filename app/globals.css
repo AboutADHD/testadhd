@@ -1,0 +1,162 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   Design system — "Calm focus"
+   Cool clinical canvas, confident indigo brand, one warm coral spark.
+   Three type roles: Sora (display), IBM Plex Sans (body), IBM Plex Mono (data).
+   ========================================================================== */
+@theme {
+  /* Fonts (CSS variables are injected by next/font on <html>). */
+  --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  /* Neutrals */
+  --color-ink: #1a1b2e;
+  --color-ink-soft: #4a4d68;
+  --color-ink-faint: #7a7e99;
+  --color-canvas: #f3f5fb;
+  --color-surface: #ffffff;
+  --color-surface-2: #f7f9fe;
+  --color-line: #e5e7f2;
+  --color-line-strong: #d3d6e8;
+
+  /* Brand indigo */
+  --color-primary: #4b45d6;
+  --color-primary-strong: #3a35b8;
+  --color-primary-soft: #ecebfb;
+  --color-primary-tint: #f4f3fe;
+
+  /* Warm coral spark — reserved for the primary CTA + signature moments */
+  --color-accent: #f26a4b;
+  --color-accent-strong: #df5230;
+
+  /* Semantic result tones */
+  --color-high: #df493e;
+  --color-high-soft: #fcebe9;
+  --color-moderate: #bf7610;
+  --color-moderate-soft: #fbf1df;
+  --color-low: #0e9f6e;
+  --color-low-soft: #e3f6ef;
+
+  /* Radii */
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.75rem;
+
+  /* Shadows */
+  --shadow-card: 0 1px 2px rgba(26, 27, 46, 0.04), 0 16px 40px -24px rgba(26, 27, 46, 0.18);
+  --shadow-lift: 0 18px 50px -22px rgba(75, 69, 214, 0.45);
+  --shadow-accent: 0 14px 38px -16px rgba(242, 106, 75, 0.55);
+
+  /* Easing */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Keep anchored sections clear of the sticky top progress/nav. */
+    scroll-padding-top: 6rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--color-primary) 22%, transparent);
+    color: var(--color-ink);
+  }
+
+  /* Visible, on-brand keyboard focus everywhere. */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+/* Numeric data — scores, counters, percentages — in the mono utility face. */
+.tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Ambient focus aura behind the hero. Pure decoration; cheap; reduced-motion off. */
+.aura {
+  background:
+    radial-gradient(42rem 30rem at 18% -8%, color-mix(in srgb, var(--color-primary) 24%, transparent), transparent 60%),
+    radial-gradient(34rem 26rem at 96% 4%, color-mix(in srgb, var(--color-accent) 20%, transparent), transparent 58%),
+    radial-gradient(40rem 32rem at 60% 120%, color-mix(in srgb, var(--color-primary) 14%, transparent), transparent 60%);
+}
+
+@keyframes auraDrift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(0, -1.5%, 0) scale(1.05); }
+}
+
+.aura-animate {
+  animation: auraDrift 18s var(--ease-out-soft) infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -150% 0; }
+  100% { background-position: 250% 0; }
+}
+
+/* Subtle sheen on the primary CTA. */
+.cta-sheen {
+  position: relative;
+  overflow: hidden;
+}
+.cta-sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 70%
+  );
+  background-size: 250% 100%;
+  animation: shimmer 5.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .aura-animate {
+    animation: none;
+  }
+}
