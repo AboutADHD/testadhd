@@ -61,6 +61,23 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: securityHeaders,
       },
+      {
+        // The HTML document must ALWAYS be revalidated. Next's default for a
+        // statically-prerendered page is `s-maxage=31536000` with no browser
+        // directive, which lets a browser (or a misconfigured shared cache) keep
+        // serving an old document. Because every build emits new hashed
+        // /_next/static chunk filenames, a stale document points at chunks that
+        // were deleted by the next deploy → they 404 → client JS never runs.
+        // `max-age=0, must-revalidate` makes the browser send a conditional
+        // request (ETag) on every load: 304 when unchanged, fresh HTML the moment
+        // a deploy changes it. Scoped to the document only — `/_next/static`
+        // matches `/:path*` above, not this rule, so assets keep their immutable
+        // year-long cache.
+        source: "/",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=0, must-revalidate" },
+        ],
+      },
     ];
   },
   async redirects() {
