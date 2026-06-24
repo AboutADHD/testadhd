@@ -3,6 +3,7 @@ import { Sora, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import { SITE } from "@/lib/site";
 import { organizationSchema, websiteSchema } from "@/lib/structured-data";
 import { JsonLd } from "@/components/JsonLd";
+import AccessibilityWidgetIsland from "@/components/accessibility/AccessibilityWidgetIsland";
 import "./globals.css";
 
 const sora = Sora({
@@ -49,15 +50,15 @@ export const metadata: Metadata = {
     title: "Test Gratuit ADHD pentru Adulți - ASRS v1.1 OMS | Rezultate Instantanee",
     description:
       "Test online confidențial ADHD pentru adulți folosind ASRS v1.1 dezvoltată de Organizația Mondială a Sănătății. Fără colectarea datelor. Începe testul gratuit acum!",
-    url: SITE.url,
+    url: `${SITE.url}/`,
     locale: SITE.locale,
-    alternateLocale: SITE.localeAlternate,
     images: [
       {
         url: SITE.ogImage.url,
         width: SITE.ogImage.width,
         height: SITE.ogImage.height,
         alt: SITE.ogImage.alt,
+        type: "image/jpeg",
       },
     ],
   },
@@ -106,6 +107,15 @@ export default function RootLayout({
       className={`${sora.variable} ${plexSans.variable} ${plexMono.variable}`}
     >
       <body>
+        {/* No-JS failsafe: the scroll-reveal sections are server-rendered at
+            opacity:0 by `motion` and only become visible once the client
+            animation runs. If JavaScript is disabled the animation never fires,
+            so force every motion-hidden block visible. The Hero does not rely on
+            this (its entrance is pure CSS), and the widget is never present
+            without JS, so this only ever reveals the Reveal-wrapped content. */}
+        <noscript>
+          <style>{`[style*="opacity:0"],[style*="opacity: 0"]{opacity:1!important;transform:none!important}`}</style>
+        </noscript>
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-ink focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
@@ -114,6 +124,8 @@ export default function RootLayout({
         </a>
         <JsonLd data={[organizationSchema(), websiteSchema()]} />
         {children}
+        {/* Floating accessibility toolbar — lazy client island, never SSR'd. */}
+        <AccessibilityWidgetIsland />
       </body>
     </html>
   );

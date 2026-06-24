@@ -137,12 +137,33 @@
   background: linear-gradient(
     100deg,
     transparent 30%,
-    rgba(255, 255, 255, 0.35) 50%,
+    color-mix(in srgb, var(--color-surface) 35%, transparent) 50%,
     transparent 70%
   );
   background-size: 250% 100%;
   animation: shimmer 5.5s ease-in-out infinite;
   pointer-events: none;
+}
+
+/* Hero entrance — a pure-CSS staggered rise. Used by components/Hero.tsx instead
+   of a `motion` client animation so the LCP headline reveals even when the page
+   JS never runs (deferred by a proxy, a sibling island crashes, or JS disabled);
+   a CSS animation also worst-cases to "visible" if it doesn't apply, since the
+   natural opacity is 1. The per-element stagger is set with inline
+   `animation-delay` in the component. */
+@keyframes heroRise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 22px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.hero-rise {
+  animation: heroRise 0.7s var(--ease-out-soft) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -158,5 +179,13 @@
   }
   .aura-animate {
     animation: none;
+  }
+  /* Collapse the hero entrance to an instant, movement-free reveal. `animation:
+     none` drops the keyframes entirely so the inline per-element delay can never
+     leave content briefly invisible for reduced-motion users. */
+  .hero-rise {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
 }

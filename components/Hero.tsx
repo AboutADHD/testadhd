@@ -1,6 +1,3 @@
-"use client";
-
-import { motion, useReducedMotion } from "motion/react";
 import { SECTIONS } from "@/lib/content";
 import { SITE } from "@/lib/site";
 
@@ -11,16 +8,24 @@ const TRUST = [
   { label: "100% confidențial" },
 ];
 
+/**
+ * Hero — the LCP surface and the first thing every visitor sees.
+ *
+ * The entrance is a *pure-CSS* staggered rise (`.hero-rise` in globals.css),
+ * deliberately NOT a `motion` client animation. Two reasons:
+ *
+ *  1. Robustness: a CSS animation runs even if the page's JavaScript never
+ *     hydrates, is deferred by a proxy, or a sibling island crashes. A
+ *     `motion` entrance ships `opacity:0` in the SSR HTML and only reveals on
+ *     the client — so any JS failure leaves the headline invisible. The LCP
+ *     element must never depend on JS to become visible.
+ *  2. Performance: keeping the Hero server-rendered drops a client island and
+ *     removes JS from the critical path of first paint.
+ *
+ * Reduced-motion is honoured in globals.css (the rise collapses to an instant,
+ * movement-free reveal), so this stays a Server Component with no hooks.
+ */
 export function Hero() {
-  const reduce = useReducedMotion();
-
-  const item = reduce
-    ? {}
-    : {
-        initial: { opacity: 0, y: 22 },
-        animate: { opacity: 1, y: 0 },
-      };
-
   return (
     <section id="top" className="relative overflow-hidden">
       {/* Ambient focus aura */}
@@ -34,39 +39,31 @@ export function Hero() {
       />
 
       <div className="mx-auto max-w-5xl px-5 pb-16 pt-16 sm:px-6 sm:pb-24 sm:pt-24">
-        <motion.div
-          {...item}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-line bg-surface/70 px-3.5 py-1.5 font-mono text-xs font-medium uppercase tracking-[0.18em] text-primary backdrop-blur">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-accent" />
-            ASRS v1.1 · Scala OMS de autoevaluare
-          </p>
-        </motion.div>
+        <p className="hero-rise mb-5 inline-flex items-center gap-2 rounded-full border border-line bg-surface/70 px-3.5 py-1.5 font-mono text-xs font-medium uppercase tracking-[0.18em] text-primary backdrop-blur">
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-accent" />
+          ASRS v1.1 · Scala OMS de autoevaluare
+        </p>
 
-        <motion.h1
-          {...item}
-          transition={{ duration: 0.7, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
-          className="max-w-3xl text-balance text-4xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-6xl"
+        <h1
+          className="hero-rise max-w-3xl text-balance text-4xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-6xl"
+          style={{ animationDelay: "0.05s" }}
         >
           Test ADHD pentru adulți,
           <span className="text-primary"> în câteva minute.</span>
-        </motion.h1>
+        </h1>
 
-        <motion.p
-          {...item}
-          transition={{ duration: 0.7, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-ink-soft sm:text-xl"
+        <p
+          className="hero-rise mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-ink-soft sm:text-xl"
+          style={{ animationDelay: "0.12s" }}
         >
           Răspunde la 18 întrebări validate de Organizația Mondială a Sănătății și
           află dacă simptomele tale merită o evaluare de specialitate. Nimic nu se
           salvează — totul rămâne în browserul tău.
-        </motion.p>
+        </p>
 
-        <motion.div
-          {...item}
-          transition={{ duration: 0.7, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-9 flex flex-wrap items-center gap-3"
+        <div
+          className="hero-rise mt-9 flex flex-wrap items-center gap-3"
+          style={{ animationDelay: "0.18s" }}
         >
           <a
             href={`#${SECTIONS.test}`}
@@ -83,12 +80,11 @@ export function Hero() {
           >
             Cum funcționează
           </a>
-        </motion.div>
+        </div>
 
-        <motion.ul
-          {...item}
-          transition={{ duration: 0.7, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-10 flex flex-wrap gap-x-6 gap-y-3"
+        <ul
+          className="hero-rise mt-10 flex flex-wrap gap-x-6 gap-y-3"
+          style={{ animationDelay: "0.24s" }}
         >
           {TRUST.map((t) => (
             <li key={t.label} className="flex items-center gap-2 text-sm font-medium text-ink-soft">
@@ -98,7 +94,7 @@ export function Hero() {
               {t.label}
             </li>
           ))}
-        </motion.ul>
+        </ul>
       </div>
     </section>
   );
