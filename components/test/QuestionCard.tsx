@@ -18,12 +18,15 @@ export const QuestionCard = memo(function QuestionCard({
   selected,
   onSelect,
   flagged,
+  active,
   disabled,
 }: {
   question: AsrsQuestion;
   selected: number | undefined;
   onSelect: (questionNumber: number, responseIndex: number) => void;
   flagged: boolean;
+  /** The auto-advance "you're here now" target — primary highlight + arrive pulse. */
+  active: boolean;
   disabled: boolean;
 }) {
   const answered = selected !== undefined;
@@ -41,8 +44,14 @@ export const QuestionCard = memo(function QuestionCard({
       aria-invalid={flagged || undefined}
       aria-describedby={flagged ? errorId : undefined}
       className={cn(
-        "scroll-mt-40 rounded-2xl border bg-surface p-5 shadow-card transition-colors sm:p-6",
-        flagged ? "border-accent ring-1 ring-accent" : "border-line",
+        "scroll-mt-28 rounded-2xl border p-5 shadow-card transition-colors sm:p-6",
+        // One background per state — cn() is a plain join and does not resolve
+        // conflicting Tailwind classes, so never emit two bg-* together.
+        flagged
+          ? "border-accent bg-surface ring-1 ring-accent"
+          : active
+            ? "q-arrive border-primary bg-primary-tint"
+            : "border-line bg-surface",
       )}
     >
       <legend className="contents">
@@ -62,7 +71,7 @@ export const QuestionCard = memo(function QuestionCard({
               question.number
             )}
           </span>
-          <p id={labelId} className="pt-0.5 text-base font-medium leading-snug text-ink sm:text-lg">
+          <p id={labelId} className="max-w-3xl pt-0.5 text-base font-medium leading-snug text-ink sm:text-lg">
             <span className="sr-only">Întrebarea {question.number}. </span>
             {question.text}
           </p>

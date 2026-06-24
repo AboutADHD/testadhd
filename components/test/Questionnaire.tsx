@@ -14,17 +14,76 @@ import { QuestionCard } from "./QuestionCard";
 import { ProgressTracker } from "./ProgressTracker";
 import { Results } from "./Results";
 
-function prefersReducedMotion() {
-  return (
-    typeof window !== "undefined" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  );
+/**
+ * Auto-advance / jump scrolling uses a hand-rolled rAF glide rather than
+ * `scrollIntoView({behavior})` for two reasons:
+ *
+ *  1. A *deliberately slow, eased* scroll (~620ms) reads as "moving you to the
+ *     next question" — an instant jump is disorienting. We drive it even when
+ *     the OS prefers reduced motion: here the movement is a small, purposeful
+ *     reorientation that aids comprehension, not decoration. (Decorative motion
+ *     elsewhere still honours reduced motion via globals.css.)
+ *  2. `html { scroll-behavior: smooth }` (and its reduced-motion `auto` switch)
+ *     would otherwise override or fight the animation; we pin it to `auto` for
+ *     the duration so our easing is the single source of truth.
+ */
+const SCROLL_MS = 620;
+let scrollRAF = 0;
+
+function easeInOutCubic(t: number) {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+function animateScrollTo(targetY: number, duration = SCROLL_MS) {
+  if (typeof window === "undefined") return;
+  const html = document.documentElement;
+  const startY = window.scrollY;
+  const distance = targetY - startY;
+  if (Math.abs(distance) < 2) return;
+  if (scrollRAF) cancelAnimationFrame(scrollRAF);
+  const prevBehavior = html.style.scrollBehavior;
+  html.style.scrollBehavior = "auto"; // don't let CSS smooth double-animate
+  const start = performance.now();
+  const step = (now: number) => {
+    const t = Math.min(1, (now - start) / duration);
+    window.scrollTo(0, startY + distance * easeInOutCubic(t));
+    if (t < 1) {
+      scrollRAF = requestAnimationFrame(step);
+    } else {
+      scrollRAF = 0;
+      html.style.scrollBehavior = prevBehavior;
+    }
+  };
+  scrollRAF = requestAnimationFrame(step);
+}
+
+/** Smoothly glide so `el` sits centred (or just below the sticky header for
+ *  `start`) in the viewport. */
+function scrollToEl(el: Element | null, block: "center" | "start" = "center") {
+  if (!el || typeof window === "undefined") return;
+  const rect = el.getBoundingClientRect();
+  const absoluteTop = rect.top + window.scrollY;
+  const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+  const target =
+    block === "center"
+      ? absoluteTop - Math.max(0, (window.innerHeight - rect.height) / 2)
+      : absoluteTop - 88; // clear the sticky header for top-aligned targets
+  animateScrollTo(Math.max(0, Math.min(target, maxY)));
 }
 
 function scrollToQuestion(num: number) {
-  const el = document.getElementById(`q-${num}`);
-  if (!el) return;
-  el.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "start" });
+  scrollToEl(document.getElementById(`q-${num}`));
+}
+
+/** The next item to advance to after answering `num`: the first unanswered
+ *  below it, else the first unanswered anywhere, else null (everything done). */
+function nextUnanswered(num: number, answers: AnswerMap): number | null {
+  const below = ASRS_QUESTIONS.find(
+    (q) => q.number > num && answers[q.number] === undefined,
+  );
+  if (below) return below.number;
+  const any = ASRS_QUESTIONS.find((q) => answers[q.number] === undefined);
+  return any ? any.number : null;
 }
 
 export function Questionnaire() {
@@ -32,6 +91,9 @@ export function Questionnaire() {
   const [submitted, setSubmitted] = useState(false);
   const [result, setResult] = useState<ScoreResult | null>(null);
   const [flagged, setFlagged] = useState<number[]>([]);
+  // The question the auto-advance has moved the user to ("you're here now"
+  // highlight). Starts on Q1 as a gentle "start here" cue.
+  const [activeQuestion, setActiveQuestion] = useState<number | null>(1);
   const [showConfirm, setShowConfirm] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -68,20 +130,24 @@ export function Questionnaire() {
   const percent = (answeredCount / TOTAL_QUESTIONS) * 100;
   const message = progressMessage(percent, partAAnswered === PART_A_COUNT);
 
+  // Auto-advance target computed (purely) inside the answer updater and consumed
+  // by the effect below. A ref — not state — so `handleSelect` stays a stable
+  // callback and the 17 untouched QuestionCards keep bailing out of re-render.
+  // `undefined` = no advance this change; `null` = all answered; number = target.
+  const advanceRef = useRef<number | null | undefined>(undefined);
+
   const handleSelect = useCallback(
     (num: number, idx: number) => {
       setAnswers((prev) => {
+        const wasUnanswered = prev[num] === undefined;
         const next = { ...prev, [num]: idx };
-        // Gentle auto-advance to the next still-unanswered item below — pointer
-        // users only, and never under reduced motion.
-        if (!submitted && !keyboardRef.current && !prefersReducedMotion()) {
-          const upcoming = ASRS_QUESTIONS.find(
-            (q) => q.number > num && next[q.number] === undefined,
-          );
-          if (upcoming) {
-            window.setTimeout(() => scrollToQuestion(upcoming.number), 220);
-          }
-        }
+        // Advance only on a *first* answer (so correcting an earlier item never
+        // yanks the page) and only for pointer input (auto-scrolling a keyboard
+        // user pulls their focused radio off-screen — WCAG 2.4.7 / 3.2.2).
+        advanceRef.current =
+          !submitted && wasUnanswered && !keyboardRef.current
+            ? nextUnanswered(num, next)
+            : undefined;
         return next;
       });
       // Clear this item's flag, but keep the same array reference when it was not
@@ -90,6 +156,26 @@ export function Questionnaire() {
     },
     [submitted],
   );
+
+  // Run the auto-advance once the answer has committed: highlight the next
+  // unanswered question ("you're here now") and gently scroll it to centre.
+  // Restored to fire under reduced motion too (scrollToEl falls back to an
+  // instant jump) — the previous build skipped it entirely for reduced-motion
+  // users, which is much of this audience.
+  useEffect(() => {
+    const target = advanceRef.current;
+    if (target === undefined) return;
+    advanceRef.current = undefined;
+    setActiveQuestion(target);
+    const id = window.setTimeout(() => {
+      if (target !== null) {
+        scrollToQuestion(target);
+      } else {
+        scrollToEl(document.getElementById("submit-scores"));
+      }
+    }, 220);
+    return () => window.clearTimeout(id);
+  }, [answers]);
 
   const handleSubmit = useCallback(() => {
     const missing = ASRS_QUESTIONS.filter((q) => answers[q.number] === undefined).map(
@@ -115,6 +201,7 @@ export function Questionnaire() {
     }
     setResult(calculateScores(answers));
     setFlagged([]);
+    setActiveQuestion(null);
     setSubmitted(true);
   }, [answers]);
 
@@ -127,10 +214,7 @@ export function Questionnaire() {
         // are taken straight to the verdict (the region's aria-label is
         // announced); the visually-hidden live region below voices the score.
         node.focus({ preventScroll: true });
-        node.scrollIntoView({
-          behavior: prefersReducedMotion() ? "auto" : "smooth",
-          block: "start",
-        });
+        scrollToEl(node, "start");
       }, 80);
       return () => window.clearTimeout(id);
     }
@@ -141,6 +225,7 @@ export function Questionnaire() {
     setResult(null);
     setSubmitted(false);
     setFlagged([]);
+    setActiveQuestion(1);
     setShowConfirm(false);
     // The dialog's trigger lived inside the now-unmounting Results, so restoring
     // focus to it would drop focus on <body>. Land the user on the fresh first
@@ -197,74 +282,84 @@ export function Questionnaire() {
     };
   }, [showConfirm]);
 
+  const questionCards = ASRS_QUESTIONS.map((q) => (
+    <QuestionCard
+      key={q.number}
+      question={q}
+      selected={answers[q.number]}
+      onSelect={handleSelect}
+      flagged={flagged.includes(q.number)}
+      active={!submitted && activeQuestion === q.number}
+      disabled={submitted}
+    />
+  ));
+
   return (
     <div>
-      {!submitted && (
-        <ProgressTracker
-          answered={answeredCount}
-          partAAnswered={partAAnswered}
-          partBAnswered={partBAnswered}
-          message={message}
-        />
-      )}
+      {submitted ? (
+        // After submit: the (disabled) questions read at a comfortable measure
+        // above the result (no rail, so they no longer need the full width).
+        <div className="max-w-5xl space-y-4">{questionCards}</div>
+      ) : (
+        // Active test: progress rail beside the questions on desktop; on mobile
+        // the rail is a sticky bar that stacks above them (single column).
+        <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[19rem_minmax(0,1fr)] lg:gap-12">
+          <ProgressTracker
+            answered={answeredCount}
+            partAAnswered={partAAnswered}
+            partBAnswered={partBAnswered}
+            message={message}
+          />
 
-      <AnimatePresence>
-        {flagged.length > 0 && !submitted && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mb-5 overflow-hidden"
-          >
-            <div className="rounded-2xl border border-accent/40 bg-accent/5 p-5" role="alert">
-              <p className="font-semibold text-ink">Te rugăm să răspunzi la toate întrebările.</p>
-              <p className="mt-2 flex flex-wrap items-center gap-1.5 text-sm text-ink-soft">
-                <span className="mr-0.5">Întrebări fără răspuns:</span>
-                {flagged.map((n) => (
-                  <button
-                    key={n}
-                    type="button"
-                    onClick={() => scrollToQuestion(n)}
-                    aria-label={`Mergi la întrebarea ${n}`}
-                    className="tabular inline-flex h-7 min-w-7 items-center justify-center rounded-md border border-accent/40 bg-surface px-1.5 font-semibold text-accent transition-colors hover:bg-accent/10"
-                  >
-                    {n}
-                  </button>
-                ))}
+          <div>
+            <AnimatePresence>
+              {flagged.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mb-5 overflow-hidden"
+                >
+                  <div className="rounded-2xl border border-accent/40 bg-accent/5 p-5" role="alert">
+                    <p className="font-semibold text-ink">Te rugăm să răspunzi la toate întrebările.</p>
+                    <p className="mt-2 flex flex-wrap items-center gap-1.5 text-sm text-ink-soft">
+                      <span className="mr-0.5">Întrebări fără răspuns:</span>
+                      {flagged.map((n) => (
+                        <button
+                          key={n}
+                          type="button"
+                          onClick={() => scrollToQuestion(n)}
+                          aria-label={`Mergi la întrebarea ${n}`}
+                          className="tabular inline-flex h-7 min-w-7 items-center justify-center rounded-md border border-accent/40 bg-surface px-1.5 font-semibold text-accent transition-colors hover:bg-accent/10"
+                        >
+                          {n}
+                        </button>
+                      ))}
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <div className="space-y-4">{questionCards}</div>
+
+            <div className="mt-8 flex flex-col items-center gap-3">
+              <button
+                id="submit-scores"
+                type="button"
+                onClick={handleSubmit}
+                className="inline-flex w-full max-w-sm items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-[#6d67f0] px-8 py-4 text-base font-semibold text-white shadow-lift transition-transform hover:-translate-y-0.5 active:translate-y-0"
+              >
+                Calculează scorul
+                <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" aria-hidden="true">
+                  <path d="M4 10h11M11 5l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+              <p className="tabular text-xs text-ink-faint">
+                {answeredCount}/{TOTAL_QUESTIONS} completate
               </p>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="space-y-4">
-        {ASRS_QUESTIONS.map((q) => (
-          <QuestionCard
-            key={q.number}
-            question={q}
-            selected={answers[q.number]}
-            onSelect={handleSelect}
-            flagged={flagged.includes(q.number)}
-            disabled={submitted}
-          />
-        ))}
-      </div>
-
-      {!submitted && (
-        <div className="mt-8 flex flex-col items-center gap-3">
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className="inline-flex w-full max-w-sm items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-[#6d67f0] px-8 py-4 text-base font-semibold text-white shadow-lift transition-transform hover:-translate-y-0.5 active:translate-y-0"
-          >
-            Calculează scorul
-            <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" aria-hidden="true">
-              <path d="M4 10h11M11 5l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-          <p className="tabular text-xs text-ink-faint">
-            {answeredCount}/{TOTAL_QUESTIONS} completate
-          </p>
+          </div>
         </div>
       )}
 
@@ -282,7 +377,7 @@ export function Questionnaire() {
           tabIndex={-1}
           role="region"
           aria-label="Rezultatul testului ASRS v1.1"
-          className="mt-8 scroll-mt-24 outline-none"
+          className="mt-8 max-w-5xl scroll-mt-24 outline-none"
         >
           <Results result={result} onRestart={() => setShowConfirm(true)} />
         </div>
