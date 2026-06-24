@@ -166,6 +166,27 @@
   animation: heroRise 0.7s var(--ease-out-soft) both;
 }
 
+/* Content-block entrance — used by components/Reveal.tsx instead of a `motion`
+   whileInView so a section's visibility never depends on the JS runtime (motion
+   can fail to reveal a block that is already in view at mount, e.g. after the
+   browser restores scroll position on reload). Plays on load with fill-mode both
+   and worst-cases to the natural opacity:1. `--reveal-y` is the rise distance,
+   set per-instance by the component. */
+@keyframes revealRise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, var(--reveal-y, 18px), 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.reveal-rise {
+  animation: revealRise 0.6s var(--ease-out-soft) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -180,10 +201,12 @@
   .aura-animate {
     animation: none;
   }
-  /* Collapse the hero entrance to an instant, movement-free reveal. `animation:
-     none` drops the keyframes entirely so the inline per-element delay can never
-     leave content briefly invisible for reduced-motion users. */
-  .hero-rise {
+  /* Collapse the hero + content entrances to an instant, movement-free reveal.
+     `animation: none` drops the keyframes entirely so the inline per-element /
+     per-block delay can never leave content briefly invisible for reduced-motion
+     users. */
+  .hero-rise,
+  .reveal-rise {
     animation: none;
     opacity: 1;
     transform: none;
