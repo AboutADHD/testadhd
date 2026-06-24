@@ -8,10 +8,17 @@ import type { NextConfig } from "next";
  * Node origin is self-contained and identical in dev and prod.
  */
 
-// Content-Security-Policy: the app loads zero third-party runtime resources
-// (fonts are self-hosted via next/font, there is no analytics, no CDN, no XHR
-// to external origins). `unsafe-inline`/`unsafe-eval` are required by the Next
-// hydration bootstrap and React Server Components inline scripts.
+// Content-Security-Policy: the app itself loads zero third-party runtime
+// resources (fonts are self-hosted via next/font + the local OpenDyslexic face,
+// there is no analytics, no CDN, no XHR to external origins). The ONE exception
+// is the accessibility widget's optional "Support" panel, which embeds a Buy Me
+// a Coffee iframe — and ONLY after an explicit user click. No BMC script runs in
+// this document, and the embedded BMC page is a separate browsing context with
+// its own CSP, so we only need to allow the frame itself (`frame-src`); the
+// parent makes no XHR to BMC, so `connect-src` stays 'self'. The Stripe origin
+// covers BMC's payment checkout sub-frame. The screening test never sends data
+// anywhere. `unsafe-inline`/`unsafe-eval` are required by the Next hydration
+// bootstrap, RSC inline scripts and the widget's injected <style>.
 const csp = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
@@ -19,6 +26,7 @@ const csp = [
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
   "connect-src 'self'",
+  "frame-src 'self' https://buymeacoffee.com https://*.stripe.com",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -32,7 +40,9 @@ const csp = [
 // These also keep the app self-contained when run without nginx (dev/preview).
 const securityHeaders = [
   { key: "Content-Security-Policy", value: csp },
-  { key: "Permissions-Policy", value: "geolocation=(), microphone=(), camera=(), browsing-topics=()" },
+  // `payment` is delegated to the Buy Me a Coffee iframe (allow="payment *" on it)
+  // so the donation checkout works; everything else stays denied.
+  { key: "Permissions-Policy", value: 'geolocation=(), microphone=(), camera=(), browsing-topics=(), payment=(self "https://buymeacoffee.com")' },
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
 ];
 
