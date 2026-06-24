@@ -33,7 +33,7 @@ export function medicalWebPageSchema() {
       "@type": "Organization",
       name: SITE.name,
       url: `${BASE}/`,
-      logo: { "@type": "ImageObject", url: SITE.logo, width: 256, height: 256 },
+      logo: { "@type": "ImageObject", url: `${BASE}${SITE.logo}`, width: 256, height: 256 },
     },
     medicalAudience: { "@type": "MedicalAudience", audienceType: "Patient" },
     about: {
@@ -51,8 +51,12 @@ export function medicalWebPageSchema() {
       name: "Adult ADHD Self-Report Scale (ASRS v1.1)",
       description:
         "Scala de autoevaluare pentru ADHD la adulți, versiunea 1.1, dezvoltată de Organizația Mondială a Sănătății",
+      // ASRS v1.1 is a *screening* instrument, never a diagnostic one. We
+      // deliberately omit `usedToDiagnose` (which asserts the test establishes a
+      // diagnosis) — that would contradict the disclaimer, the FAQ and the
+      // screening≠diagnostic promise the whole product is built on. The
+      // page-level `about: MedicalCondition` already associates the page with ADHD.
       testType: "Screening test",
-      usedToDiagnose: { "@type": "MedicalCondition", name: "ADHD la adulți" },
     },
     applicationCategory: "HealthApplication",
     operatingSystem: "Web browser",
@@ -110,7 +114,7 @@ export function organizationSchema() {
     "@type": "Organization",
     name: SITE.name,
     url: BASE,
-    logo: SITE.logo,
+    logo: `${BASE}${SITE.logo}`,
     description:
       "Platformă online gratuită pentru screening-ul ADHD la adulți folosind scala ASRS v1.1 dezvoltată de Organizația Mondială a Sănătății",
     foundingDate: "2024",

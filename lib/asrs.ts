@@ -77,7 +77,7 @@ export const ASRS_QUESTIONS: readonly AsrsQuestion[] = [
     part: "A",
     domain: "inatentie",
     thresholdIndex: 3,
-    text: "Atunci când ai o sarcină care necesită multă gândire/efort susținut de concentrare, cât de des eviți sau întârzii să începeți?",
+    text: "Atunci când aveți o sarcină care necesită multă gândire sau efort susținut de concentrare, cât de des evitați sau întârziați să o începeți?",
   },
   {
     number: 5,

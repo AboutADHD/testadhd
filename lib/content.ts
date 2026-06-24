@@ -2,7 +2,7 @@
  * Editorial + clinical content for the informational sections. Kept as data so
  * the components stay presentational and the Romanian copy lives in one place.
  */
-import { RESOURCES } from "./site";
+import { RESOURCES, type BrandKey } from "./site";
 
 export interface ResourceCard {
   kind: "educational" | "clinical" | "community";
@@ -10,6 +10,8 @@ export interface ResourceCard {
   description: string;
   linkLabel: string;
   href: string;
+  /** Partner brand whose logo leads the card (omit for unbranded cards). */
+  brand?: BrandKey;
 }
 
 export const RESOURCE_CARDS: ResourceCard[] = [
@@ -20,6 +22,7 @@ export const RESOURCE_CARDS: ResourceCard[] = [
       "O colecție de referințe bibliografice, precum ghidurile internaționale de practică medicală și convențiile de consens.",
     linkLabel: "despreadhd.ro",
     href: RESOURCES.despreadhd,
+    brand: "despreadhd",
   },
   {
     kind: "clinical",
@@ -28,6 +31,7 @@ export const RESOURCE_CARDS: ResourceCard[] = [
       "Profesioniști cu experiență în evaluarea, diagnosticul și tratamentul ADHD la adulți, copii și adolescenți.",
     linkLabel: "doctoradhd.com",
     href: RESOURCES.doctoradhd,
+    brand: "doctoradhd",
   },
   {
     kind: "community",
@@ -97,7 +101,7 @@ export const SCORING_TABLES: ScoringTable[] = [
 ];
 
 export const VALIDITY_INTRO =
-  "Deși ASRS v1.1 poate diagnostica eficient ADHD la adulți, nu poate exclude alte afecțiuni medicale care ar putea impacta diagnosticul ADHD. Validitatea variază în funcție de versiunea utilizată (screening sau completă).";
+  "Deși ASRS v1.1 poate identifica eficient o probabilitate ridicată de ADHD la adulți, nu poate exclude alte afecțiuni medicale care ar putea influența interpretarea simptomelor. Validitatea variază în funcție de versiunea utilizată (screening sau completă).";
 
 export interface ValidityRow {
   measure: string;
@@ -209,7 +213,7 @@ export const FAQ: FaqItem[] = [
   {
     question: "Sunt datele mele personale colectate sau stocate?",
     answer:
-      "Nu, aplicația este complet confidențială. Nu colectăm, stocăm sau transmitem nicio informație personală. Toate calculele se fac local în browserul dumneavoastră și rezultatele nu sunt salvate nicăieri.",
+      "Nu, aplicația este complet confidențială. Nu colectăm, stocăm sau transmitem nicio informație personală. Toate calculele se fac local în browserul dumneavoastră și rezultatele nu sunt salvate nicăieri. Singurul lucru păstrat local (în memoria browserului) sunt preferințele de accesibilitate ale interfeței — de exemplu contrastul mărit sau reducerea animațiilor — niciodată răspunsurile sau rezultatele dumneavoastră.",
   },
   {
     question: "Cât timp durează completarea testului?",
@@ -240,7 +244,7 @@ export const WHO_COPYRIGHT =
   "ADHD-ASRS Screener v1.1 și ADHD-ASRS Symptom Checklist v1.1 sunt protejate prin drepturi de autor de către World Health Organisation.";
 
 export const CONFIDENTIAL_BANNER =
-  "100% CONFIDENȚIAL — nu colectăm nicio informație despre tine, nu folosim cookie-uri și nu stocăm rezultatele.";
+  "100% CONFIDENȚIAL — nu colectăm nicio informație despre tine, nu folosim cookie-uri și nu stocăm rezultatele. Local rămân doar preferințele de accesibilitate ale interfeței, niciodată răspunsurile tale.";
 
 /** Page anchors used by the in-page navigation and structured data. */
 export const SECTIONS = {
