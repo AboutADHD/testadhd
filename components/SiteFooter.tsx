@@ -1,10 +1,11 @@
 import { BrandMark } from "./BrandMark";
+import { BrandLogo } from "./BrandLogo";
 import { WHO_COPYRIGHT } from "@/lib/content";
-import { RESOURCES, SITE } from "@/lib/site";
+import { RESOURCES, SITE, type BrandKey } from "@/lib/site";
 
-const LINKS = [
-  { label: "despreadhd.ro", href: RESOURCES.despreadhd },
-  { label: "doctoradhd.com", href: RESOURCES.doctoradhd },
+const LINKS: { label: string; href: string; brand?: BrandKey }[] = [
+  { label: "despreadhd.ro", href: RESOURCES.despreadhd, brand: "despreadhd" },
+  { label: "doctoradhd.com", href: RESOURCES.doctoradhd, brand: "doctoradhd" },
   { label: "Comunitate Facebook", href: RESOURCES.facebookGroup },
   { label: "Cod sursă (GitHub)", href: SITE.githubRepo },
 ];
@@ -47,8 +48,9 @@ export function SiteFooter() {
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-ink-soft underline-offset-4 transition-colors hover:text-primary hover:underline"
+                    className="inline-flex items-center gap-1.5 text-ink-soft underline-offset-4 transition-colors hover:text-primary hover:underline"
                   >
+                    {link.brand && <BrandLogo brand={link.brand} size={16} decorative />}
                     {link.label}
                   </a>
                 </li>

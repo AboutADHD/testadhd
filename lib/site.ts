@@ -10,7 +10,6 @@ export const SITE = {
   domain: "testadhd.ro",
   lang: "ro",
   locale: "ro_RO",
-  localeAlternate: "en_US",
   themeColor: "#4B45D6",
   email: "contact@aboutadhd.ro",
   twitter: "@aboutadhdro",
@@ -25,8 +24,11 @@ export const SITE = {
     height: 675,
     alt: "Test ADHD pentru adulți - ASRS v1.1",
   },
-  // Brand logo used as Organization/publisher logo in structured data.
-  logo: "https://www.despreadhd.ro/content/images/size/w256h256/2024/03/About-ADHD-brain-icon.png",
+  // Brand logo (self-hosted under /public/brand) used as the Organization /
+  // publisher logo in structured data. Resolved to an absolute URL via SITE.url
+  // in lib/structured-data.ts. Self-hosting keeps the "no external requests"
+  // promise intact — the same asset powers the inline About ADHD brand mark.
+  logo: "/brand/despreadhd.png",
   title: "Test ADHD adulți (screening) - ASRS v1.1 (Adult ADHD Self-Report Scale)",
   description:
     "Test online gratuit ADHD pentru adulți folosind ASRS v1.1 dezvoltată de OMS. Screening confidențial cu rezultate instantanee. Fără colectarea datelor personale. Începe testul acum!",
@@ -58,3 +60,27 @@ export const RESOURCES = {
     "https://www.apaservices.org/practice/reimbursement/health-registry/self-reporting-sympton-scale.pdf",
   seminalPaper: "https://pubmed.ncbi.nlm.nih.gov/15841682/",
 } as const;
+
+/**
+ * Partner brand marks rendered inline next to their mentions (resource cards,
+ * footer, result recommendations). Single source of truth so every mention
+ * shares one logo + label + URL. Assets are self-hosted under /public/brand
+ * (transparent 256×256 PNGs), so they add no external requests. Consumed by the
+ * <BrandLogo> component.
+ */
+export const BRAND_LOGOS = {
+  doctoradhd: {
+    src: "/brand/doctoradhd.png",
+    alt: "DoctorADHD",
+    label: "doctoradhd.com",
+    href: RESOURCES.doctoradhd,
+  },
+  despreadhd: {
+    src: "/brand/despreadhd.png",
+    alt: "despreadhd.ro",
+    label: "despreadhd.ro",
+    href: RESOURCES.despreadhd,
+  },
+} as const;
+
+export type BrandKey = keyof typeof BRAND_LOGOS;

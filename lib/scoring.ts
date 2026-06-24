@@ -11,6 +11,7 @@ import {
   isShaded,
   type AnswerMap,
 } from "./asrs";
+import { RESOURCES, type BrandKey } from "./site";
 
 export type Level = "ridicat" | "moderat" | "scazut";
 
@@ -129,6 +130,8 @@ export interface Recommendation {
   text: string;
   href?: string;
   linkLabel?: string;
+  /** Partner brand whose logo precedes the link (when present). */
+  brand?: BrandKey;
 }
 
 /** Build the conditional recommendation list shown beneath the result. */
@@ -152,8 +155,9 @@ export function buildRecommendations(result: ScoreResult): Recommendation[] {
   recs.push({
     tone: "info",
     text: "Pentru mai multe informații despre ADHD și opțiuni de tratament, vizitați",
-    href: "https://www.doctoradhd.com",
+    href: RESOURCES.doctoradhd,
     linkLabel: "doctoradhd.com",
+    brand: "doctoradhd",
   });
 
   return recs;
