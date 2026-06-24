@@ -1,6 +1,7 @@
 import { Section } from "./Section";
 import { Reveal } from "./Reveal";
 import { FAQ, SECTIONS } from "@/lib/content";
+import { IconChatQuestion } from "./icons";
 
 /**
  * Native <details> accordion — content stays in the DOM (good for SEO + the
@@ -11,8 +12,10 @@ export function Faq() {
     <Section
       id={SECTIONS.faq}
       eyebrow="Întrebări frecvente"
-      title="Ce vor să știe oamenii înainte de test"
+      icon={<IconChatQuestion className="h-3.5 w-3.5" />}
+      title="Ce ai putea dori să știi despre acest test?"
       className="bg-surface-2"
+      contentClassName="max-w-4xl"
     >
       <div className="space-y-3">
         {FAQ.map((item, i) => (

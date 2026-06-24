@@ -2,6 +2,7 @@ import { Section } from "./Section";
 import { Reveal } from "./Reveal";
 import { BrandLogo } from "./BrandLogo";
 import { RESOURCE_CARDS, type ResourceCard } from "@/lib/content";
+import { IconCompass } from "./icons";
 
 // Coral --color-accent is reserved for the primary CTA + signature moments, so
 // the three resource kinds tone with the indigo/teal system instead. The
@@ -16,6 +17,7 @@ export function Resources() {
   return (
     <Section
       eyebrow="Mergi mai departe"
+      icon={<IconCompass className="h-3.5 w-3.5" />}
       title="Informare, evaluare și sprijin"
       lead="Testul este doar primul pas. Iată unde poți afla mai multe și unde poți cere ajutor."
     >

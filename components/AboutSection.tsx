@@ -1,16 +1,18 @@
 import { Section } from "./Section";
 import { Reveal } from "./Reveal";
 import { ABOUT_INTRO, AUDIENCE, INFO_FACTS, SECTIONS } from "@/lib/content";
+import { IconInfo } from "./icons";
 
 export function AboutSection() {
   return (
     <Section
       id={SECTIONS.about}
       eyebrow="Despre test"
+      icon={<IconInfo className="h-3.5 w-3.5" />}
       title="Ce este Adult ADHD Self-Report Scale (ASRS v1.1)?"
       lead={ABOUT_INTRO}
     >
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {INFO_FACTS.map((fact, i) => (
           <Reveal key={fact.label} delay={i * 0.05}>
             <div className="h-full rounded-2xl border border-line bg-surface p-5 shadow-card">

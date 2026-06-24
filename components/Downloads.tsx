@@ -1,16 +1,17 @@
 import { Section } from "./Section";
 import { Reveal } from "./Reveal";
 import { RESOURCES } from "@/lib/site";
+import { IconDownload as IconDownloadEyebrow } from "./icons";
 
 const FILES = [
   {
-    title: "ASRS v1.1 Original (APA)",
+    title: "ASRS v1.1 original (APA)",
     description: "Versiunea oficială în limba engleză.",
     href: RESOURCES.apaPdf,
     external: true,
   },
   {
-    title: "ASRS v1.1 — Traducere română",
+    title: "ASRS v1.1, traducere în limba română",
     description: "Scala de autoevaluare în limba română (PDF).",
     href: RESOURCES.romanianPdf,
     external: false,
@@ -29,9 +30,11 @@ export function Downloads() {
   return (
     <Section
       eyebrow="Resurse"
+      icon={<IconDownloadEyebrow className="h-3.5 w-3.5" />}
       title="Descarcă scala ASRS v1.1"
       lead="Explorează scala originală sau traducerea în română pentru mai multe detalii."
       className="bg-surface-2"
+      contentClassName="max-w-4xl"
     >
       <div className="grid gap-4 sm:grid-cols-2">
         {FILES.map((file, i) => (

@@ -2,12 +2,14 @@ import { Section } from "./Section";
 import { Reveal } from "./Reveal";
 import { COMPONENTS, SCORING_TABLES, SECTIONS } from "@/lib/content";
 import { SCORE_RANGES } from "@/lib/scoring";
+import { IconScale } from "./icons";
 
 export function ScoringSection() {
   return (
     <Section
       id={SECTIONS.scoring}
       eyebrow="Structură & scoring"
+      icon={<IconScale className="h-3.5 w-3.5" />}
       title="Ce evaluează și cum se calculează scorul"
       className="bg-surface-2"
     >
@@ -48,8 +50,8 @@ export function ScoringSection() {
               <div className="rounded-xl border border-line bg-surface-2 px-4 py-3">
                 <p className="font-mono text-[0.7rem] uppercase tracking-[0.16em] text-ink-faint">Interval</p>
                 <p className="tabular mt-1 text-lg font-semibold text-ink">
-                  0–{SCORE_RANGES.partA}
-                  <span className="text-sm font-normal text-ink-faint"> (0–{SCORE_RANGES.total} complet)</span>
+                  0-{SCORE_RANGES.partA}
+                  <span className="text-sm font-normal text-ink-faint"> (0-{SCORE_RANGES.total} complet)</span>
                 </p>
               </div>
               <div className="rounded-xl border border-primary/20 bg-primary-tint px-4 py-3">

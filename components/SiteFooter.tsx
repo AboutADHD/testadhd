@@ -15,8 +15,8 @@ export function SiteFooter() {
 
   return (
     <footer className="border-t border-line bg-surface">
-      <div className="mx-auto max-w-5xl px-5 py-14 sm:px-6">
-        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr]">
+      <div className="shell py-14">
+        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr] lg:max-w-5xl">
           <div>
             <div className="flex items-center gap-2.5">
               <BrandMark className="h-7 w-7" />
@@ -67,7 +67,7 @@ export function SiteFooter() {
           </nav>
         </div>
 
-        <div className="mt-12 space-y-4 border-t border-line pt-8 text-xs leading-relaxed text-ink-faint">
+        <div className="mt-12 space-y-4 border-t border-line pt-8 text-xs leading-relaxed text-ink-faint lg:max-w-5xl">
           <p>
             <span className="font-semibold text-ink-soft">Drepturi de autor (OMS): </span>
             {WHO_COPYRIGHT} Acest test este destinat exclusiv în scop informativ (de

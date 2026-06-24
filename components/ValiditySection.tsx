@@ -7,14 +7,17 @@ import {
   VALIDITY_NOTE,
   VALIDITY_ROWS,
 } from "@/lib/content";
+import { IconShieldCheck } from "./icons";
 
 export function ValiditySection() {
   return (
     <Section
       id={SECTIONS.validity}
       eyebrow="Validitate"
+      icon={<IconShieldCheck className="h-3.5 w-3.5" />}
       title="Cât de precis este testul"
       lead={VALIDITY_INTRO}
+      contentClassName="max-w-4xl"
     >
       <Reveal>
         <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
@@ -63,7 +66,7 @@ export function ValiditySection() {
                 <span className="tabular shrink-0 font-semibold text-primary">{i + 1}.</span>
                 <span>
                   {ref.title}{" "}
-                  <span className="text-ink-faint">— {ref.authors}.</span>{" "}
+                  <span className="text-ink-faint">({ref.authors}).</span>{" "}
                   <a
                     href={ref.href}
                     target="_blank"

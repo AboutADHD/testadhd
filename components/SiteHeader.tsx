@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { NAV_ITEMS, SECTIONS } from "@/lib/content";
 import { cn } from "@/lib/cn";
 import { BrandMark } from "./BrandMark";
+import { IconArrowRight } from "./icons";
 
 /** Sticky top bar with brand, scroll-spy nav and a persistent start-test action. */
 export function SiteHeader() {
@@ -45,8 +46,8 @@ export function SiteHeader() {
           : "border-transparent bg-transparent",
       )}
     >
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5 sm:px-6">
-        <a href="#top" className="flex items-center gap-2.5" aria-label="Test ADHD — acasă">
+      <div className="shell flex h-16 items-center justify-between gap-4">
+        <a href="#top" className="flex items-center gap-2.5" aria-label="Test ADHD, acasă">
           <BrandMark className="h-7 w-7" />
           <span className="font-display text-base font-bold tracking-tight text-ink">
             Test<span className="text-primary">ADHD</span>
@@ -75,9 +76,10 @@ export function SiteHeader() {
 
         <a
           href={`#${SECTIONS.test}`}
-          className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-ink px-4 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 active:translate-y-0"
+          className="group inline-flex min-h-11 items-center gap-1.5 rounded-full bg-ink px-4 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 active:translate-y-0"
         >
           Începe testul
+          <IconArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
         </a>
       </div>
     </header>
