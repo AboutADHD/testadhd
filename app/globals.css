@@ -103,6 +103,44 @@
   letter-spacing: -0.01em;
 }
 
+/* ----------------------------------------------------------------------------
+   Fluid layout shell
+   The page is intentionally NOT a narrow centered column. `.shell` fills the
+   viewport (padding grows with the screen) up to a generous cap so ultra-wide
+   monitors stay sane; sections then USE that width with multi-column layouts.
+   Prose blocks inside keep their own readable measure (max-w-* on the text), so
+   "wide" never means "long unreadable lines".
+   -------------------------------------------------------------------------- */
+.shell {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 120rem; /* ~1920px — full-bleed on laptops, capped only on huge displays */
+  padding-inline: clamp(1.25rem, 4vw, 4.5rem);
+}
+
+/* A comfortable reading measure for body prose inside a wide shell. */
+.measure {
+  max-width: 42rem;
+}
+.measure-wide {
+  max-width: 56rem;
+}
+
+/* One-shot "you advanced here" pulse for the auto-progression highlight. The
+   resting ring is a Tailwind class on the card; this only adds the arrival
+   flourish. Collapsed to nothing under reduced motion (see media query below). */
+@keyframes questionArrive {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-primary) 38%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 12px transparent;
+  }
+}
+.q-arrive {
+  animation: questionArrive 0.9s var(--ease-out-soft) 1;
+}
+
 /* Ambient focus aura behind the hero. Pure decoration; cheap; reduced-motion off. */
 .aura {
   background:
@@ -154,16 +192,18 @@
 @keyframes heroRise {
   from {
     opacity: 0;
-    transform: translate3d(0, 22px, 0);
+    transform: translate3d(0, 24px, 0);
+    filter: blur(4px);
   }
   to {
     opacity: 1;
     transform: translate3d(0, 0, 0);
+    filter: blur(0);
   }
 }
 
 .hero-rise {
-  animation: heroRise 0.7s var(--ease-out-soft) both;
+  animation: heroRise 0.85s var(--ease-out-soft) both;
 }
 
 /* Content-block entrance — used by components/Reveal.tsx instead of a `motion`
@@ -175,16 +215,34 @@
 @keyframes revealRise {
   from {
     opacity: 0;
-    transform: translate3d(0, var(--reveal-y, 18px), 0);
+    transform: translate3d(0, var(--reveal-y, 24px), 0);
+    filter: blur(3px);
   }
   to {
     opacity: 1;
     transform: translate3d(0, 0, 0);
+    filter: blur(0);
   }
 }
 
+/* Default: the reveal plays once on load. Pure CSS, needs no JS, and worst-cases
+   to the natural opacity:1 — a block's visibility never depends on the runtime
+   (this is the load-bearing fix for the old whileInView "frozen invisible" bug). */
 .reveal-rise {
-  animation: revealRise 0.6s var(--ease-out-soft) both;
+  animation: revealRise 0.7s var(--ease-out-soft) both;
+}
+
+/* Progressive enhancement: where the browser supports scroll-driven animations,
+   drive the SAME reveal off scroll position so each block animates in as it
+   enters the viewport — the "scroll reveal" feel of the reference sites, but
+   still 100% CSS, so it can never freeze a section the way a JS whileInView
+   reveal could. Browsers without scroll timelines keep the on-load animation. */
+@supports (animation-timeline: view()) {
+  .reveal-rise {
+    animation: revealRise both var(--ease-out-soft);
+    animation-timeline: view();
+    animation-range: entry 5% entry 45%;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -210,5 +268,6 @@
     animation: none;
     opacity: 1;
     transform: none;
+    filter: none;
   }
 }

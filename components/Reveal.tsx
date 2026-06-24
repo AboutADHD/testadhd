@@ -22,7 +22,7 @@ import { cn } from "@/lib/cn";
 export function Reveal({
   children,
   delay = 0,
-  y = 18,
+  y = 24,
   className,
 }: {
   children: ReactNode;
