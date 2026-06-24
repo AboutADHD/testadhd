@@ -41,7 +41,7 @@ export function Downloads() {
               target="_blank"
               rel="noopener noreferrer"
               {...(file.external ? {} : { download: true })}
-              className="group flex h-full items-center gap-4 rounded-2xl border border-line bg-surface p-5 shadow-card transition-all hover:-translate-y-0.5 hover:border-primary/40"
+              className="group flex h-full items-center gap-4 rounded-2xl border border-line bg-surface p-5 shadow-card transition-[transform,border-color] duration-300 ease-out hover:-translate-y-0.5 hover:border-primary/40"
             >
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary-soft transition-colors group-hover:bg-primary/15">
                 <DownloadIcon />

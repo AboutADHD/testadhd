@@ -62,7 +62,7 @@ export function SiteHeader() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors",
+                  "inline-flex min-h-11 items-center rounded-full px-3.5 text-sm font-medium transition-colors",
                   isActive ? "text-primary" : "text-ink-soft hover:text-ink",
                 )}
                 aria-current={isActive ? "true" : undefined}
@@ -75,7 +75,7 @@ export function SiteHeader() {
 
         <a
           href={`#${SECTIONS.test}`}
-          className="inline-flex items-center gap-1.5 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5"
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-ink px-4 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 active:translate-y-0"
         >
           Începe testul
         </a>

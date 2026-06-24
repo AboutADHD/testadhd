@@ -2,8 +2,9 @@
 
 import { motion } from "motion/react";
 import { ScoreBar } from "./ScoreBar";
+import { BrandLogo } from "@/components/BrandLogo";
 import { cn } from "@/lib/cn";
-import { PART_A_COUNT, PART_B_COUNT } from "@/lib/asrs";
+import { PART_A_COUNT, PART_A_POSITIVE_CUTOFF, PART_B_COUNT } from "@/lib/asrs";
 import {
   GENERAL_INTERPRETATION,
   LEVEL_COPY,
@@ -46,9 +47,9 @@ export function Results({
     >
       {/* Headline verdict */}
       <div className="border-b border-line p-6 sm:p-8">
-        <p className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-ink-faint">
+        <h3 className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-ink-faint">
           Rezultatul testului ASRS v1.1
-        </p>
+        </h3>
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <span className={cn("inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold", BADGE[copy.tone])}>
             <span className="h-2 w-2 rounded-full bg-current" />
@@ -71,6 +72,7 @@ export function Results({
             value={result.partAScore}
             max={PART_A_COUNT}
             tone={copy.tone}
+            threshold={PART_A_POSITIVE_CUTOFF}
             sublabel={partAInterpretation(result.partAScore)}
           />
           <ScoreBar
@@ -127,8 +129,9 @@ export function Results({
                       href={rec.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-semibold text-primary underline-offset-4 hover:underline"
+                      className="inline-flex items-center gap-1 align-[-0.18em] font-semibold text-primary underline-offset-4 hover:underline"
                     >
+                      {rec.brand && <BrandLogo brand={rec.brand} size={16} decorative />}
                       {rec.linkLabel}
                     </a>
                     .
