@@ -50,3 +50,7 @@ Thumbs.db
 .code-review-graph/
 # codesight: static markdown context map, regenerated on demand with `codesight`
 /.codesight/
+
+# Per-developer (local) assistant settings + editor backups — not shared
+.claude/settings.local.json
+*.bak

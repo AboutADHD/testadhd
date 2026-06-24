@@ -34,6 +34,56 @@ faster, cheaper, and give structural context file-scanning cannot. Full guide:
 Fall back to Grep/Glob/Read only when the graph/map don't cover what you need. The graph is
 authoritative when the two disagree (it auto-refreshes; codesight does not).
 
+## Frontend / a11y skills — invoke when the task fits (`.claude/skills/`)
+
+Curated skills live in `.claude/skills/`. **When a task touches UI, visual design, motion,
+React/Next, accessibility, SEO, or Romanian interface copy, invoke the matching skill (via the
+`Skill` tool) before writing code.** They carry best-practice detail this file can't; the **project overrides below
+bind all of them** — follow the override, not the skill, on any conflict. Full rationale,
+the rejected-skills list, and extra vetted-but-not-imported skills: `docs/skills.md`.
+
+| When the work is… | Skill |
+|---|---|
+| The questionnaire form — radios, labels, validation, fieldset/legend, progress | `forms-specialist` |
+| Copy / errors / instructions / reducing cognitive load (the ADHD audience) | `cognitive-accessibility` |
+| Writing/editing Romanian UI strings — results, the fixed scale, validation, privacy/disclaimer, FAQ | `microcopy-ro` (house voice) + `ux-writing` (craft) |
+| ARIA, keyboard nav, focus order, `aria-live`, reduced motion in React UI | `frontend-a11y` |
+| Any TSX/hook; the `"use client"`/RSC boundary; where state should live | `react-patterns` |
+| Cutting re-renders / first-load JS; Core Web Vitals; long-list rendering | `react-performance` |
+| Any `motion/react` animation (Hero, `Reveal`, transitions) | `motion-foundations` + `motion-ui` |
+| UI polish — spacing, radii, shadows, hit areas, `.tabular` numerals, transition scope | `make-interfaces-feel-better` |
+| Aesthetic direction / de-templating a section | `frontend-design-direction` (or the `frontend-design` plugin) |
+| A chart or score/results visualization (no chart lib today — hand-rolled SVG/Tailwind) | `tufte` + `data-visualization` |
+| Metadata, JSON-LD, robots/sitemap/manifest, titles/headings | `seo` |
+
+**Project overrides (ignore any skill step that breaks these):**
+- **No backend/network/persistence/analytics** — ignore skill examples using `fetch`, Server
+  Actions, SWR/React Query, MSW, or "add analytics". Scoring stays 100% client-side.
+- **No test runner** — verify ONLY with `npm run build` + `lint` + `typecheck`. Ignore every
+  "write a test / vitest / jest-axe / TDD" step (`react-*`, `forms-specialist`, `frontend-a11y`
+  all mention tests); do the a11y/behaviour check manually.
+- **`motion/react`, never `framer-motion`** — rewrite any `framer-motion` import in a snippet.
+  Reduced motion defers to the existing `Reveal` no-op; don't add a parallel hook. Don't split
+  motion tokens into a JS file — `app/globals.css` `@theme` stays the single source of truth.
+- **Design tokens only** — express colours via `@theme` Tailwind utilities (`text-ink`,
+  `bg-surface`, `bg-accent`…); never hardcode hex/rgba from a skill example; coral
+  `--color-accent` is CTA-only. Don't generate a separate `design-tokens.json`.
+- **Keep the RSC boundary** — skill examples are usually client components; new hooks/handlers
+  stay inside the existing islands (`Reveal`, `SiteHeader`, `Hero`, `components/test/*`).
+- **`AnswerMap` presence via `=== undefined`** — never the truthiness/`.trim()` checks some
+  form examples use (`0` is a valid answer).
+- **Romanian copy is surface-specific & promise-bound** (binds `microcopy-ro`/`ux-writing`):
+  impersonal clinical voice for results/recommendations, warm "tu" for UI chrome, legacy formal
+  "dumneavoastră" only in about/FAQ/disclaimer — `ux-writing` defaults to informal, don't flatten.
+  Never imply answers are saved/stored/transmitted; never frame a positive screen as "ai ADHD"
+  (use *probabilitate/trăsături*); the five scale labels (Niciodată…Foarte des) are a clinical
+  contract with the engine — never paraphrase. Diacritics use comma-below `ș/ț`.
+
+`forms-specialist`, `cognitive-accessibility` (Community-Access) and `ux-writing`
+(content-designer) are MIT; `tufte` is MIT (aref-vc); `microcopy-ro` is first-party (this repo's
+Romanian copy layer, adapted from the donatie sibling); `data-visualization` (NTCoding) and the
+eight ECC craft skills are vendored. Full per-skill licensing/provenance: `docs/skills.md`.
+
 ## Tech stack
 
 - **Next.js 16** (App Router, React Server Components) · **React 19** · **TypeScript**
@@ -164,3 +214,6 @@ Read on demand (progressive disclosure — detailed, not needed every session):
   deploy steps, git/migration history.
 - `docs/code-intelligence.md` — full guide to code-review-graph + codesight (config,
   commands, complementarity, no-interference setup).
+- `docs/skills.md` — the curated `.claude/skills/` frontend/a11y/motion/SEO set: what each
+  skill is for, the project guardrails that bind them, why others were rejected, licensing/
+  attribution, and extra vetted skills available to add later.
