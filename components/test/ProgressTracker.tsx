@@ -46,7 +46,15 @@ export function ProgressTracker({
           </div>
         </div>
 
-        <div className="relative mt-2 h-2 overflow-hidden rounded-full bg-line">
+        <div
+          className="relative mt-2 h-2 overflow-hidden rounded-full bg-line"
+          role="progressbar"
+          aria-valuemin={0}
+          aria-valuemax={TOTAL_QUESTIONS}
+          aria-valuenow={answered}
+          aria-valuetext={`${answered} din ${TOTAL_QUESTIONS} întrebări completate`}
+          aria-label="Progresul testului"
+        >
           <motion.div
             className="h-full rounded-full bg-gradient-to-r from-primary to-[#6d67f0]"
             initial={false}
