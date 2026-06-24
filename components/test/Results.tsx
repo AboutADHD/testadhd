@@ -68,7 +68,7 @@ export function Results({
       <div className="grid gap-6 p-6 sm:p-8 md:grid-cols-2">
         <div className="space-y-5">
           <ScoreBar
-            label="Partea A — screening (Întrebările 1-6)"
+            label="Partea A: screening (Întrebările 1-6)"
             value={result.partAScore}
             max={PART_A_COUNT}
             tone={copy.tone}
@@ -76,7 +76,7 @@ export function Results({
             sublabel={partAInterpretation(result.partAScore)}
           />
           <ScoreBar
-            label="Partea B — suplimentar (Întrebările 7-18)"
+            label="Partea B: suplimentar (Întrebările 7-18)"
             value={result.partBScore}
             max={PART_B_COUNT}
             tone="info"

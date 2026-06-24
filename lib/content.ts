@@ -213,7 +213,7 @@ export const FAQ: FaqItem[] = [
   {
     question: "Sunt datele mele personale colectate sau stocate?",
     answer:
-      "Nu, aplicația este complet confidențială. Nu colectăm, stocăm sau transmitem nicio informație personală. Toate calculele se fac local în browserul dumneavoastră și rezultatele nu sunt salvate nicăieri. Singurul lucru păstrat local (în memoria browserului) sunt preferințele de accesibilitate ale interfeței — de exemplu contrastul mărit sau reducerea animațiilor — niciodată răspunsurile sau rezultatele dumneavoastră.",
+      "Nu, aplicația este complet confidențială. Nu colectăm, stocăm sau transmitem nicio informație personală. Toate calculele se fac local în browserul dumneavoastră și rezultatele nu sunt salvate nicăieri. Singurul lucru păstrat local (în memoria browserului) sunt preferințele de accesibilitate ale interfeței (de exemplu contrastul mărit sau reducerea animațiilor), niciodată răspunsurile sau rezultatele dumneavoastră.",
   },
   {
     question: "Cât timp durează completarea testului?",
@@ -244,7 +244,7 @@ export const WHO_COPYRIGHT =
   "ADHD-ASRS Screener v1.1 și ADHD-ASRS Symptom Checklist v1.1 sunt protejate prin drepturi de autor de către World Health Organisation.";
 
 export const CONFIDENTIAL_BANNER =
-  "100% CONFIDENȚIAL — nu colectăm nicio informație despre tine, nu folosim cookie-uri și nu stocăm rezultatele. Local rămân doar preferințele de accesibilitate ale interfeței, niciodată răspunsurile tale.";
+  "100% CONFIDENȚIAL: nu colectăm nicio informație despre tine, nu folosim cookie-uri și nu stocăm rezultatele. Local rămân doar preferințele de accesibilitate ale interfeței, niciodată răspunsurile tale.";
 
 /** Page anchors used by the in-page navigation and structured data. */
 export const SECTIONS = {
@@ -257,7 +257,7 @@ export const SECTIONS = {
 
 export const NAV_ITEMS: { label: string; href: string }[] = [
   { label: "Despre ASRS", href: `#${SECTIONS.about}` },
-  { label: "Structură & Scoring", href: `#${SECTIONS.scoring}` },
+  { label: "Structură & scoring", href: `#${SECTIONS.scoring}` },
   { label: "Validitate", href: `#${SECTIONS.validity}` },
   { label: "Începe testul", href: `#${SECTIONS.test}` },
 ];
@@ -267,10 +267,10 @@ export const NAV_ITEMS: { label: string; href: string }[] = [
  * done — keeps ADHD users in momentum without being patronising.
  */
 export function progressMessage(percent: number, partAComplete: boolean): string {
-  if (percent <= 0) return "Hai să începem — primul pas este cel mai important.";
+  if (percent <= 0) return "Hai să începem. Primul pas este cel mai important.";
   if (percent < 33) return "Mergi bine. Răspunde sincer, gândindu-te la ultimele 6 luni.";
   if (partAComplete && percent < 40) return "Ai terminat Partea A. Continuăm cu Partea B.";
-  if (percent < 75) return "Ești pe drumul cel bun — a mai rămas mai puțin de jumătate.";
+  if (percent < 75) return "Ești pe drumul cel bun, a mai rămas mai puțin de jumătate.";
   if (percent < 100) return "Aproape gata. Încă puțin.";
   return "Ai completat tot. Apasă „Calculează scorul” pentru rezultat.";
 }

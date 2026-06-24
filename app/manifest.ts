@@ -3,7 +3,7 @@ import { SITE } from "@/lib/site";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Test ADHD adulți — ASRS v1.1",
+    name: "Test ADHD adulți: ASRS v1.1",
     short_name: "Test ADHD",
     description: SITE.description,
     lang: "ro-RO",

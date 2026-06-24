@@ -230,7 +230,7 @@ const ro: LocaleStrings = {
   supportSubtext: 'Menții platforma liberă pentru toți',
   supportCta: 'Susține ☕',
   supportBackToA11y: '← Accesibilitate',
-  supportIframeTitle: 'Cumpără-ne o cafea — Doctor ADHD',
+  supportIframeTitle: 'Cumpără-ne o cafea (Doctor ADHD)',
   supportLoadFailed: 'Widgetul de donații nu a putut fi încărcat.',
   supportOpenExternal: 'Deschide pe buymeacoffee.com ↗',
 };
