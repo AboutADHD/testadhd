@@ -64,7 +64,11 @@ export function ProgressTracker({
           />
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+        {/* Detail rows (Part A/B counts, time-left, motivational line) only fit the
+            desktop side rail. On mobile the tracker is a sticky top bar, so it stays
+            a compact count + bar + percent strip — a tall card here would pin ~180px
+            over the viewport top and hide the title of the just-advanced question. */}
+        <div className="mt-3 hidden flex-wrap items-center gap-2 text-xs lg:flex">
           <span className="tabular inline-flex items-center gap-1 rounded-full bg-primary-soft px-2.5 py-1 font-medium text-primary">
             Partea A {partAAnswered}/{PART_A_COUNT}
           </span>
@@ -78,7 +82,7 @@ export function ProgressTracker({
           )}
         </div>
 
-        <p className="mt-3 text-xs leading-relaxed text-ink-soft" aria-live="polite">
+        <p className="mt-3 hidden text-xs leading-relaxed text-ink-soft lg:block" aria-live="polite">
           {message}
         </p>
       </div>
