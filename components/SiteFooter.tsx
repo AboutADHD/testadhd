@@ -1,5 +1,6 @@
 import { BrandMark } from "./BrandMark";
 import { BrandLogo } from "./BrandLogo";
+import { NetworkGallery } from "./NetworkGallery";
 import { WHO_COPYRIGHT } from "@/lib/content";
 import { RESOURCES, SITE, type BrandKey } from "@/lib/site";
 
@@ -66,6 +67,8 @@ export function SiteFooter() {
             </ul>
           </nav>
         </div>
+
+        <NetworkGallery />
 
         <div className="mt-12 space-y-4 border-t border-line pt-8 text-xs leading-relaxed text-ink-faint lg:max-w-5xl">
           <p>
