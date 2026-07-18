@@ -15,7 +15,7 @@ export const SITE = {
   twitter: "@aboutadhdro",
   githubRepo: "https://github.com/hodorogandrei/testadhd",
   author: {
-    name: "Andrei Hodorog",
+    name: "Andrei Hodorog, Ph.D.",
     linkedin: "https://www.linkedin.com/in/andreihodorog/",
   },
   ogImage: {
