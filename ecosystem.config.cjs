@@ -21,7 +21,18 @@ module.exports = {
       // Invoke the Next.js CLI directly so PM2 owns the Node process.
       script: "./node_modules/next/dist/bin/next",
       args: "start -p 9460 -H 127.0.0.1",
-      interpreter: "node",
+      // RUNTIME = Node 24 LTS, pinned by absolute path (2026-11). The box's shared
+      // system /usr/bin/node is 22 and serves ~20 other tenants, so it is NOT
+      // upgraded in place — this app opts in on its own (same pattern as the
+      // donatie-despreadhd.ro sibling). The PM2 God Daemon (global PM2 v7, started
+      // by pm2-testadhd.service) stays on the system node; only this child runs on
+      // 24. Native deps (@next/swc, sharp) are N-API → no rebuild across majors.
+      // Changing this line needs `./pm2-isolated.sh delete` + `start` (a plain
+      // reload keeps the old interpreter); `start` re-saves the dump so boot-time
+      // `pm2 resurrect` comes back on 24. Keep in step with scripts/check-node.mjs.
+      // Rollback: point it back at /usr/bin/node, revert package.json engines +
+      // the prebuild guard + .nvmrc, `npm ci && npm run build`, delete + start.
+      interpreter: "/home/runcloud/.nvm/versions/node/v24.22.3/bin/node",
 
       exec_mode: "fork",
       instances: 1,
