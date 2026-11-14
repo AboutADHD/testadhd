@@ -86,26 +86,29 @@ eight ECC craft skills are vendored. Full per-skill licensing/provenance: `docs/
 
 ## Tech stack
 
-- **Next.js 16** (App Router, React Server Components) · **React 19** · **TypeScript**
+- **Next.js 16.4** (App Router, React Server Components) · **React 19** · **TypeScript**
   (strict, `noUncheckedIndexedAccess`, `verbatimModuleSyntax`).
 - **Tailwind CSS v4** — CSS-first; tokens in `app/globals.css` `@theme`. **No
   `tailwind.config.js`.** Configured only via `@tailwindcss/postcss`.
 - **`motion`** (^12) for animation · **`next/font`** (Sora, IBM Plex Sans, IBM Plex Mono).
-- **ESM** (`type: "module"`). **Node 22** (`.nvmrc`; `engines` floor is `>=20.9.0`).
+- **ESM** (`type: "module"`). **Node 24 LTS** (`.nvmrc` 24; `engines` `>=24.11.0`), pinned
+  **per-app** via PM2 `interpreter` → `/home/runcloud/.nvm/versions/node/v24.22.3/bin/node`. The shared system
+  `/usr/bin/node` is **22** and serves other tenants — **never upgrade it in place**.
 - Runtime: **PM2 (isolated)** + **nginx** + **Cloudflare Origin TLS**, port **9460**.
 
 ## Commands
 
 ```bash
+export PATH=/home/runcloud/.nvm/versions/node/v24.22.3/bin:$PATH   # Node 24 first — system node is 22
 npm install
 npm run dev          # dev server, http://localhost:9460
-npm run build        # production build; type-checks as a side effect
+npm run build        # prebuild guard (scripts/check-node.mjs) refuses Node <24; type-checks
 npm run start        # prod server on 0.0.0.0:9460
 npm run lint         # ESLint (flat config)
 npm run typecheck    # tsc --noEmit
 node scripts/generate-icons.mjs       # regenerate PWA/Apple PNG icons (run from repo root)
 ./pm2-isolated.sh start|reload|restart|stop|status|logs   # ALWAYS manage PM2 via this wrapper
-npm ci && npm run build && ./pm2-isolated.sh reload       # deploy
+npm ci && npm run build && ./pm2-isolated.sh reload       # deploy (with the Node 24 PATH above)
 ```
 
 **There is NO test runner** — no `test` script, no test deps, zero test files. **Never run
@@ -124,7 +127,7 @@ components/test/   The interactive questionnaire (the only stateful feature)
 lib/          Framework-free core (single source of truth): asrs.ts + scoring.ts (clinical),
               content.ts (all copy), site.ts (URLs/brand/SEO), structured-data.ts (JSON-LD),
               cn.ts
-public/       OG image, ASRS PDF, PWA icons     scripts/  generate-icons.mjs (only file)
+public/       OG image, ASRS PDF, PWA icons     scripts/  generate-icons.mjs, check-node.mjs
 docs/         Detailed reference docs (progressive disclosure)
 ```
 
@@ -199,7 +202,8 @@ Detail + the content↔engine consistency contract: `docs/asrs-scoring.md`.
 ## Workflow
 
 - **Branch:** `main` is the working branch. Make focused commits per the convention above.
-- **Deploy:** `npm ci && npm run build && ./pm2-isolated.sh reload` from the repo root.
+- **Deploy:** `npm ci && npm run build && ./pm2-isolated.sh reload` from the repo root, with
+  Node 24 first on `PATH` (the prebuild guard fails on the system Node 22 by design).
   Detail: `docs/deployment.md`.
 
 ## Reference documents

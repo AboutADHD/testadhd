@@ -11,12 +11,24 @@ No backend, no database — 100% client-side at runtime.
 
 - **Package:** `testadhd-ro` @ `2.0.0` (the rewrite; the static app was implicitly v1).
   `private: true`, `type: "module"` (ESM), license `CC-BY-4.0`.
-- **Pinned runtime deps:** `next 16.2.9`, `react 19.2.7`, `react-dom 19.2.7`,
+- **Pinned runtime deps:** `next 16.4.6`, `react 19.2.9`, `react-dom 19.2.9`,
   `motion ^12.40.0`. Dev: `tailwindcss ^4.3.1` + `@tailwindcss/postcss`, `eslint ^9.39.0`
-  + `eslint-config-next 16.2.9`, `typescript ^6.0.3`, `@types/node ^26`. `next` and
-  `eslint-config-next` are exact-pinned.
-- **Node version truth:** `engines.node` requires `>=20.9.0`, but **`.nvmrc` pins `22`** —
-  the authoritative target, matching the host runtime. Use Node 22.
+  + `eslint-config-next 16.4.6`, `typescript ^6.0.3`, `@types/node ^24` (matches the runtime),
+  `@types/react ~19.2.18`, `@types/react-dom ~19.2.7`. `next`, `react`, `react-dom` and
+  `eslint-config-next` are exact-pinned; React stays on the 19.2 patch line on purpose (a
+  caret range would pull the unrequested 19.3 minor — App Router renders with Next's vendored
+  React anyway).
+- **Node version truth: Node 24 LTS** — `.nvmrc` `24`, `engines.node >=24.11.0` (first 24 LTS),
+  and production runs `/home/runcloud/.nvm/versions/node/v24.22.3/bin/node` via the PM2 `interpreter`.
+  The box's shared **system `/usr/bin/node` is 22** (NodeSource apt, serves ~20 other tenants'
+  PM2 daemons/crons) and is **deliberately not upgraded in place** — this app opts in on its
+  own, same pattern as the `donatie-despreadhd.ro` sibling. Because a plain shell resolves
+  `node` to 22, the npm **`prebuild`** hook runs `scripts/check-node.mjs`, which fails
+  `npm run build` on Node <24 and prints the exact `PATH=… npm run build` to use.
+- **Migrated 2026-11-14** (Node 22 → 24.22.3, Next 16.2.9 → 16.4.6). `npm audit`: 19 → 7;
+  `--omit=dev` → 0. The 7 left are moderate, dev-only (`minimatch` via `typescript-eslint`
+  ≤8.72.2, already the newest release) — lint tooling, never shipped. ESLint 10, TS 7 and
+  `motion` 14 are separate majors, intentionally not adopted in this migration.
 - **TypeScript (`tsconfig.json`):** `target ES2022`, `module/moduleResolution esnext/bundler`,
   `strict`, `noUncheckedIndexedAccess`, `verbatimModuleSyntax`, `isolatedModules`, `noEmit`,
   `jsx react-jsx`, path alias `@/* → ./*`. `next-env.d.ts` is gitignored (generated).
@@ -32,7 +44,8 @@ typecheck  → tsc --noEmit
 pm2:start  → ./pm2-isolated.sh start           # + pm2:reload/restart/stop/logs/status
 ```
 
-Plus `node scripts/generate-icons.mjs` (regenerates PWA/Apple PNG icons; the only file in `scripts/`).
+Plus `node scripts/generate-icons.mjs` (regenerates PWA/Apple PNG icons) and
+`scripts/check-node.mjs` (the `prebuild` Node ≥24 guard, run automatically by `npm run build`).
 
 **No-test reality:** there is **no `test` script, no test runner dependency, and zero test
 files** (`git ls-files` finds no `*.test.*`/`*.spec.*`/`__tests__`). `components/test/` is
@@ -77,8 +90,12 @@ Managed by an **isolated PM2 instance** so it never collides with the other apps
 **`ecosystem.config.cjs`** — one app:
 - **name** `testadhd-prod`, **namespace** `testadhd`, **cwd** the repo root.
 - **script** `./node_modules/next/dist/bin/next`, **args** `start -p 9460 -H 127.0.0.1`,
-  **interpreter** `node` — invokes the Next CLI directly (not `npm start`) so PM2 owns the
-  Node process. Binds `127.0.0.1` (nginx-only); `npm start` binds `0.0.0.0`.
+  **interpreter** `/home/runcloud/.nvm/versions/node/v24.22.3/bin/node` (absolute — Node 24, see above) —
+  invokes the Next CLI directly (not `npm start`) so PM2 owns the Node process. The PM2
+  God Daemon itself (global PM2 v7, started by systemd) stays on system Node 22; only the
+  app child runs on 24, and `dump.pm2` records `exec_interpreter` so boot-time `resurrect`
+  comes back on 24. **Changing the interpreter needs `./pm2-isolated.sh delete` + `start`**
+  — a plain `reload` keeps the old binary. Binds `127.0.0.1` (nginx-only); `npm start` binds `0.0.0.0`.
 - **exec_mode** `fork`, **instances** `1` (deliberate; scaling = extra instances on distinct
   ports behind an nginx upstream).
 - **Restart:** `autorestart`, `max_restarts:10`, `min_uptime:"20s"`, `restart_delay:4000`,
@@ -110,8 +127,13 @@ hardcoded paths.
 ## Deploy workflow
 
 ```bash
+export PATH=/home/runcloud/.nvm/versions/node/v24.22.3/bin:$PATH   # Node 24 first (system node is 22)
 npm ci && npm run build && ./pm2-isolated.sh reload
 ```
+
+**Rollback of the Node 24 runtime:** point `interpreter` back at `/usr/bin/node`, revert
+`engines`/`prebuild`/`.nvmrc` (+ `next`/`eslint-config-next` 16.2.9 if needed), `npm ci &&
+npm run build` on Node 22, then `./pm2-isolated.sh delete && ./pm2-isolated.sh start`.
 
 `reload` passes `--update-env` and re-saves the PM2 dump. Gitignored build/runtime
 artifacts: `node_modules`, `.next/`, `out/`, `logs/`, `.pm2-isolated/`, env files,
