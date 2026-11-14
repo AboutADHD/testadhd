@@ -22,10 +22,10 @@ Aplicație **Next.js 16** (App Router), succesoarea variantei statice dintr-un s
 
 | Strat        | Tehnologie                                            |
 | ------------ | ----------------------------------------------------- |
-| Framework    | Next.js 16 (App Router, RSC) · React 19 · TypeScript  |
+| Framework    | Next.js 16.4 (App Router, RSC) · React 19 · TypeScript |
 | Stilizare    | Tailwind CSS v4 (`@theme`) · `motion`                 |
 | Tipografie   | Sora · IBM Plex Sans · IBM Plex Mono (`next/font`)     |
-| Rulare       | Node 22 · PM2 (izolat) · nginx (reverse proxy)        |
+| Rulare       | Node 24 LTS · PM2 (izolat) · nginx (reverse proxy)    |
 
 ## Dezvoltare
 
@@ -70,9 +70,12 @@ probabilitate ridicată de ADHD și necesitatea unei evaluări clinice. Logica t
 
 Aplicația rulează ca proces Node pe portul **9460**, gestionat de o instanță **PM2 izolată**
 (`PM2_HOME=./.pm2-isolated`, namespace `testadhd`), în spatele unui **reverse proxy nginx** care
-termină certificatul **Cloudflare Origin** și păstrează redirect-ul apex → `www`.
+termină certificatul **Cloudflare Origin** și păstrează redirect-ul apex → `www`. Aplicația
+rulează pe **Node 24** (fixat per aplicație prin `interpreter` în PM2; Node-ul de sistem, 22,
+rămâne neschimbat pentru celelalte aplicații de pe server).
 
 ```bash
+export PATH=/home/runcloud/.nvm/versions/node/v24.22.3/bin:$PATH
 npm ci && npm run build && ./pm2-isolated.sh reload
 ```
 
